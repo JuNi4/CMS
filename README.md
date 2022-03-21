@@ -1,6 +1,8 @@
 # Console Messenger System (CMS)
- 
-Live Server Based Console Messenger System
+By JuNi4
+
+## Live Server Based Console Messenger System
+Part of CLOS
 
 > client.py - Messenger Client, Basic Sending & Reciving
 > server.py - Messenger Server, Basic Server

@@ -5,14 +5,9 @@
 
 # Imports
 from getpass import getpass
-import re
-from shutil import ExecError
 import threading
 import platform
-import datetime
 import subprocess
-import keyboard
-import pathlib
 import socket
 import sys
 import os
@@ -20,7 +15,6 @@ import time
 # File Dialog
 import tkinter as tk
 from tkinter import filedialog
-from PIL import Image
 import json
 # Images
 import itj
@@ -48,6 +42,142 @@ def getarg(arg, alt):
 
 arg = sys.argv
 
+## Client Server
+def client_server(ip = "", cpid = '', toasts = True):
+    # Window Focus and Toast stuff
+    if not 'Windows' in platform.system():
+        import gi
+        gi.require_version("Wnck", "3.0")
+        from gi.repository import Wnck
+        from Xlib import X, XK, protocol, display, Xcursorfont
+        from Xlib.ext import xtest
+        from Xlib.protocol import request
+    else:
+        from win10toast import ToastNotifier
+    # If current window in focus
+    def isFocused():
+        if 'Windows' in platform.system():
+            return True
+        disp = display.Display()
+        root = disp.screen().root
+        pointer_info = request.QueryPointer(display = disp.display, window = root)
+        root_xpos, root_ypos = (pointer_info._data['root_x'], pointer_info._data['root_y'])
+        targetwindow = disp.get_input_focus().focus
+        scr = Wnck.Screen.get_default()
+        scr.force_update()
+        fwin = targetwindow.id
+        scr = Wnck.Screen.get_default()
+        scr.force_update()
+        cwin = scr.get_active_window().get_xid()
+        return fwin==cwin
+    # Toasts
+    def Toast(msg, titl):
+        if toasts:
+            if 'Windows' in platform.system():
+                toaster = ToastNotifier()
+                toaster.show_toast("titl","lol",)
+            else:
+                subprocess.Popen(['notify-send', titl, msg])
+    # "" == INADDR_ANY
+    SERVER = ip
+    PORT = 4243
+
+    # Puffergroesse fuer recv()
+    BUF_SIZE = 1024
+
+    # Dies ist der Server.
+
+    # Server-Port oeffnen
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_address = (SERVER, PORT)
+
+    # Server an den Port binden
+    sock.bind(server_address)
+
+    #print("Server arbeitet auf Port ", PORT, sep="")
+    show_img = True
+    if '-disimg' in sys.argv:
+        show_img = False
+
+
+    while True:
+            # Receive response
+            data, server = sock.recvfrom(4096)
+            if data.decode()[0:32] == "!leave_account_requested_by_self":
+                if data.decode()[0:41] == "!leave_account_requested_by_self _nonself":
+                    if data.decode()[42:48] == "__msg:":
+                        print('You got Kicked! Reason: '+data.decode()[48:])
+                        if not isFocused():
+                            Toast("Disconnected: Kicked: "+data.decode()[48:], "Messenger")
+                    else:
+                        print('You got kicked!')
+                        if not isFocused():
+                            Toast("Disconnected: Kicked", "Messenger")
+                    if 'Windows' in platform.system():
+                        os.system('taskkill /PID '+cpid+' /F>nil')
+                    else:
+                        os.system('kill '+cpid+'>nil')
+                    
+                    time.sleep(2)
+                elif data.decode()[0:42] == "!leave_account_requested_by_self _svclosed":
+                    if not isFocused():
+                        Toast("Disconnected: Server Closed", "Messenger")
+                    print('Server Closed')
+                    if 'Windows' in platform.system():
+                        os.system('taskkill /PID '+cpid+' /F>nil')
+                    else:
+                        os.system('kill '+cpid+'>nil')
+                    time.sleep(2)
+                exit()
+            elif data.decode()[:19]=='!important_message ':
+                print(data.decode()[19:])
+                Toast(data.decode()[19:], "Messenger")
+            elif data.decode()[:4] == '!img':
+                rcvstr = data.decode()[5:]+','
+                # Recive every part part of the image
+                while not '}' in list(rcvstr):
+                    data, address = sock.recvfrom(4096)
+                    if not '}' in list(data.decode()):
+                        rcvstr += data.decode()+','
+                    else:
+                        dat = data.decode()[:data.decode().index('}')+1]
+                        rcvstr += dat
+                # Print Json Image data
+                #print(rcvstr.replace('\n','').replace(' ', ''))
+                # Load text to json
+                #f = open("json.json",'w')
+                #f.write(rcvstr)
+                #f.close()
+                rcvstr = rcvstr[:len(rcvstr)-2]+rcvstr[len(rcvstr)-2:].replace(',','')
+                ij = json.loads(rcvstr)
+                w = int(ij["w"])
+                h = int(ij["h"])
+                w2 = w
+                h2 = h
+                sc = 1
+                # shrink image down if needed
+                while w2 > 38 or h2 > 38:
+                    sc += 1
+                    w2 = int(w/sc)
+                    h2 = int(h/sc)
+                # get calculated shrink values and shrink
+                sendji = itj.manage_json(1,sc,rcvstr)
+                # display
+                itj.json_to_text(1,sc,sendji)
+            elif data.decode() == '!secure_corckrl':
+                try:
+                    os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+                except:
+                    os.system('start chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+            elif not data.decode() == '':
+                print(data.decode())
+                if not 'Windows' in platform.system():
+                    if not isFocused():
+                        Toast(data.decode(), "Messenger")
+
+
+## Client
 # IP Check
 if '-ip' in arg:
     SERVER = arg[arg.index('-ip')+1]

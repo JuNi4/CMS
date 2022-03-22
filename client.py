@@ -48,6 +48,35 @@ def getarg(arg, alt):
 
 arg = sys.argv
 
+if 'list' in arg:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(bytes("/list", encoding='utf-8'), (getarg('-ip', 'localhost'),int(getarg('-p', '4244'))))
+    sock.close()
+    # ip and port for list server
+    SERVER = ""
+    PORT = 4245
+
+    # Puffergroesse fuer recv()
+    BUF_SIZE = 1024
+
+    # Dies ist der Server.
+
+    # Server-Port oeffnen
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_address = (SERVER, int(PORT))
+
+    # Server an den Port binden
+    x = True
+    sock.bind(server_address)
+    while x:
+        data, server = sock.recvfrom(4096)
+        if data.decode() == '!system_message:end':
+            x = False
+        else:
+            print(data.decode())
+    exit()
+
 ## Client Server
 def client_server(ip = "", cpid = '', toasts = True):
     # Window Focus and Toast stuff

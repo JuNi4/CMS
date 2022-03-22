@@ -112,3 +112,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+list_server_log.txt
+server_log.txt

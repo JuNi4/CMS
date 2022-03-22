@@ -13,6 +13,7 @@ ToDo:
 import platform
 import datetime
 import socket
+import select
 import sys
 import os
 import time
@@ -89,6 +90,7 @@ while True:
     c = 0
     for o in reg_servers_ip:
         try:
+            log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Refreshing Server with Name "+reg_servers_name[reg_servers_ip.index(o)]+".", l_file)
             sock.sendto(bytes('_Still Active dude?', encoding='utf-8'), (o,int(reg_servers_p[c])))
             data2, address = sock.recvfrom(4096)
             addr2 = address
@@ -124,6 +126,7 @@ while True:
     if msg[0:13] == 'list_register':
         larg = msg.split(' ')
         #print(msg)
+        if larg[3] == '': larg[3] = 'NoName'
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Added New Server, IP: "+larg[1]+' Port: '+larg[2]+' Name: '+larg[3]+'.', l_file)
         reg_servers_ip.append(larg[1])
         reg_servers_name.append(larg[3])
@@ -148,8 +151,8 @@ while True:
             else:
                 pwq = 'N'
             # Spaces Between UserCount and Server Type
-            sbut = 
-            sock.sendto(bytes('  '+reg_servers_name[c]+sn2+reg_servers_ip[c]+sip2+reg_servers_p[c]+' '*sp+pwq+' '*10+reg_servers_uc[c]+' ', encoding='utf-8'), (addr[0],4245))
+            sbut = 20-len(reg_servers_uc[c])
+            sock.sendto(bytes('  '+reg_servers_name[c]+sn2+reg_servers_ip[c]+sip2+reg_servers_p[c]+' '*sp+pwq+' '*10+reg_servers_uc[c]+' '*sbut+reg_servers_tp[c], encoding='utf-8'), (addr[0],4245))
             c += 1
         sock.sendto(bytes('!system_message:end', encoding='utf-8'), (addr[0],4245))
         if dev:

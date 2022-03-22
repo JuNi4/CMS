@@ -66,7 +66,8 @@ list_server_ip=getarg('-lsip', 'localhost')
 list_server_port=getarg('-lsp', '4244')
 server_name=getarg('-name', '')
 server_port=getarg('-p', '4242')
-listtheserver=els, l_file=getarg('-lf', '')
+listtheserver=els
+l_file=getarg('-lf', '')
 ch_log=getarg('-cl', '')
 apw=getarg('-apw','jf/eu§nf(7UF+3ef5#]534*')
 pw = getarg('-pw', '')
@@ -109,6 +110,9 @@ if not list_server_port == '':
 if bool(listtheserver):
     lspd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
+    # if localhost is entered intstead of 127.0.0.1
+    if list_server_ip == 'localhost': list_server_ip = '127.0.0.1'
+
     try:
         lspd.connect((list_server_ip, int(list_server_port)))
         lspd.close()
@@ -120,7 +124,8 @@ if bool(listtheserver):
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Rigistering Server on List Server as "+server_name+".", l_file)
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.sendto(bytes('list_register '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' 0','utf-8'), (list_server_ip, int(list_server_port)))
+            sock.sendto(bytes('list_register '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' 0 Srv','utf-8'), (list_server_ip, int(list_server_port)))
+            print('list_register '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' 0 Srv')
             sock.close()
             log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Server Registered.", l_file)
         except:
@@ -563,7 +568,7 @@ while True:
     elif addr[0] == list_server_ip and msg == '_Still Active dude?':
         time.sleep(0.1)
         log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] List Server Ping',l_file)
-        sock.sendto(bytes('list_update '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' '+str(len(usr)),'utf-8'), (list_server_ip, int(list_server_port)))
+        sock.sendto(bytes('list_update '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' '+str(len(usr)+' Srv'),'utf-8'), (list_server_ip, int(list_server_port)))
     elif addr[0] in usr and not msg == '':
         if addr[0] in auth or epw == False:
             log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)

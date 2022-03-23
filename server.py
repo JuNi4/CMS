@@ -109,9 +109,6 @@ if not list_server_port == '':
     log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] List Server Port: "+list_server_port, l_file)
 if bool(listtheserver):
     lspd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
-    # if localhost is entered intstead of 127.0.0.1
-    if list_server_ip == 'localhost': list_server_ip = '127.0.0.1'
 
     try:
         lspd.connect((list_server_ip, int(list_server_port)))
@@ -121,6 +118,8 @@ if bool(listtheserver):
         s.connect(("8.8.8.8", 80))
         cserver_ip = s.getsockname()[0]
         s.close()
+        # if localhost is entered, chanhge to own ip
+        if list_server_ip == 'localhost': list_server_ip = cserver_ip
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Rigistering Server on List Server as "+server_name+".", l_file)
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -222,6 +221,7 @@ while True:
         data, address = sock.recvfrom(4096)
         addr = address
         msg = data.decode()
+        print(msg,str(addr))
     except Exception as exp:
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] An Error Acurred: "+str(exp), l_file)
         addr = ["0", 0]
@@ -568,7 +568,7 @@ while True:
     elif addr[0] == list_server_ip and msg == '_Still Active dude?':
         time.sleep(0.1)
         log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] List Server Ping',l_file)
-        sock.sendto(bytes('list_update '+cserver_ip+' '+str(PORT)+' '+server_name+' '+str(epw)+' '+str(len(usr)+' Srv'),'utf-8'), (list_server_ip, int(list_server_port)))
+        sock.sendto(bytes('list_update '+str(cserver_ip)+' '+str(PORT)+' '+str(server_name)+' '+str(epw)+' '+str(len(usr))+' Srv','utf-8'), (list_server_ip, int(list_server_port)))
     elif addr[0] in usr and not msg == '':
         if addr[0] in auth or epw == False:
             log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)

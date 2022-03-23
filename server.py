@@ -64,7 +64,7 @@ else:
 # Vars
 list_server_ip=getarg('-lsip', 'localhost')
 list_server_port=getarg('-lsp', '4244')
-server_name=getarg('-name', '')
+server_name=getarg('-name', 'NoName')
 server_port=getarg('-p', '4242')
 listtheserver=els
 l_file=getarg('-lf', '')

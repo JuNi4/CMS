@@ -151,7 +151,7 @@ while True:
             else:
                 pwq = 'N'
             # Spaces Between UserCount and Server Type
-            sbut = 20-len(reg_servers_uc[c])
+            sbut = 8-len(reg_servers_uc[c])
             sock.sendto(bytes('  '+reg_servers_name[c]+sn2+reg_servers_ip[c]+sip2+reg_servers_p[c]+' '*sp+pwq+' '*10+reg_servers_uc[c]+' '*sbut+reg_servers_tp[c], encoding='utf-8'), (addr[0],4245))
             c += 1
         sock.sendto(bytes('!system_message:end', encoding='utf-8'), (addr[0],4245))

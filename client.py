@@ -49,11 +49,10 @@ def getarg(arg, alt):
             return sys.argv[sys.argv.index(arg)+1]
         else: return alt
 
-# Text to Speech
+# Text to Speech if error accours: pip install playsound==1.2.2
 def tts(text, lan):
     tts = gtts.gTTS(text=text, lang=lan)
     tts.save("tts.mp3")
-    time.sleep(0.1)
     # Play file with playsound
     try:
         playsound.playsound("tts.mp3")
@@ -237,9 +236,9 @@ def client_server(ip = "", cpid = '', toasts = True):
                     os.system('start chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
             #tts messages
             elif data.decode()[:4] == '!tts':
-                print(data.decode()[4:])
+                print(data.decode()[5:])
                 if tts_enabled:
-                    tts(data.decode()[4:],tts_lang)
+                    tts(data.decode()[5:],tts_lang)
             elif not data.decode() == '':
                 print(data.decode())
                 if not 'Windows' in platform.system():

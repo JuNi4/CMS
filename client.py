@@ -5,7 +5,7 @@
 
 """
 ToDo:
- -
+ - Extra Library installer that works for Windows and Linux and for servers and clients
 
 """
 

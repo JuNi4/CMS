@@ -456,6 +456,11 @@ while True:
                     #print(e)
                     pass
                 time.sleep(0.01)
+    # Recive & Send TTS messages
+    elif msg[0:4] == '/tts' and addr[0] in usr:
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Recived TTS from USR: "+usrn[usr.index(addr[0])], l_file)
+        for o in usr:
+            sock.sendto(bytes('!tts '+usrn[usr.index(addr[0])]+' sais '+msg[5:], 'utf-8'),(o,4243))
     # Admin commands
     elif msg[0:1] == '!':
         cmdlist = ['help','chatlog_clear','chatlog_en','chatlog_dis','kick', 'stop', 'reasonkick', 'imp']

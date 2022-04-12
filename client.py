@@ -22,6 +22,9 @@ import time
 import tkinter as tk
 from tkinter import filedialog
 import json
+# Text to Speech
+import gtts
+import playsound
 # Images
 import itj
 
@@ -45,6 +48,26 @@ def getarg(arg, alt):
         if arg in sys.argv:
             return sys.argv[sys.argv.index(arg)+1]
         else: return alt
+
+# Text to Speech
+def tts(text, lan):
+    tts = gtts.gTTS(text=text, lang=lan)
+    tts.save("tts.mp3")
+    time.sleep(0.1)
+    # Play file with playsound
+    try:
+        playsound.playsound("tts.mp3")
+    except:
+        print("Error: Could not play sound file")
+    os.remove('tts.mp3')
+
+# Text to speech setup
+if '-dis_tts' in sys.argv:
+    tts_enabled = False
+else:
+    tts_enabled = True
+
+tts_lang = getarg('-tts_lang', 'en')
 
 arg = sys.argv
 
@@ -212,6 +235,11 @@ def client_server(ip = "", cpid = '', toasts = True):
                     os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
                 except:
                     os.system('start chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+            #tts messages
+            elif data.decode()[:4] == '!tts':
+                print(data.decode()[4:])
+                if tts_enabled:
+                    tts(data.decode()[4:],tts_lang)
             elif not data.decode() == '':
                 print(data.decode())
                 if not 'Windows' in platform.system():

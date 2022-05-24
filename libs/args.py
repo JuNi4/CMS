@@ -151,3 +151,24 @@ def get_arg(arg_name, argv):
                         return True
                 elif args_value_type[index] == 'any':
                     return True
+
+# Generate Config File Function
+def generate_config_file(config_path):
+    # Open Config File
+    f = open(config_path, 'w')
+    # Write Config File
+    config_data = {}
+    for i in range(len(args_has_config)):
+        if args_config_name[i] == '':
+            continue
+        if args_value_type[i] == 'any':
+            config_data[args_config_name[i]] = ''
+        elif args_value_type[i] == 'int':
+            config_data[args_config_name[i]] = 0
+        elif args_value_type[i] == 'float':
+            config_data[args_config_name[i]] = 0.0
+        elif args_value_type[i] == 'bool':
+            config_data[args_config_name[i]] = False
+    f.write(json.dumps(config_data, indent=4))
+    # Close Config File
+    f.close()

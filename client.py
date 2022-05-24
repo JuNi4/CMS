@@ -28,6 +28,25 @@ import playsound
 # Images
 import itj
 
+# Import Arguments
+# Check if libs folder exists
+if os.path.exists('libs'):
+    sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
+import args
+
+# Config file
+# Check if config file exists
+if os.path.isfile(os.path.dirname(os.path.relpath(__file__))+'/config.json'):
+    args.config_path = os.path.dirname(os.path.relpath(__file__))+'/config.json'
+
+# Setup Arguments
+args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_missing_text='Print this help message', has_value=False) # Help
+args.add_arg('-ip', args.ARG_REQUIRED, arg_missing_text='The IP of the server to connect to') # IP
+args.add_arg('-port', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-p', arg_missing_text='The port of the server to connect to') # Port
+args.add_arg('-username', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-u', arg_missing_text='The username that will be shown') # Username
+args.add_arg('-tts_language', args.ARG_OPTIONAL, arg_alt_value='en', arg_has_alt=True, arg_alt_name='-ttsl', arg_missing_text='The language of the text to speech voice') # Text to Speech Language
+args.add_arg('-disable_tts', args.ARG_OPTIONAL)
+
 # Colors
 def rgb(r=0,g=255,b=50):
     return '\033[38;2;'+str(r)+';'+str(g)+';'+str(b)+'m'

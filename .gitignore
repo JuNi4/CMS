@@ -120,3 +120,5 @@ dmypy.json
 list_server_log.txt
 server_log.txt
 libs/test.py
+
+bad_words.txt

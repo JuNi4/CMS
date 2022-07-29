@@ -47,13 +47,12 @@ import args
 import itj
 
 # Setup args
-args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_missing_text='Enables Bad Word List. Default: Disabled', value_type='bool')
-args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_missing_text='Bad Word List; Example: -bwl bad_word_list.txt')
+args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool')
+args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt')#, value_type='str')
 
 # Get Args
 BWLE = args.get_arg('-bad_word_list_enable', arg)
 BADWORDFILE = args.get_arg('-bad_word_list', arg)
-print(args.get_arg('-bad_word_list', arg))
 
 ## Args
 # help
@@ -96,6 +95,10 @@ if ch_log == '':
     if not 'Windows' in platform.system():
         ch_log = os.path.dirname(os.path.realpath(__file__))+'/messenger_chat_log.txt'
 log('\n\nlog from '+"--"+datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")+"--\n", l_file, False)
+
+# Get Start Time
+start_time = time.time()
+
 log('---------------------------------------------', l_file)
 log(' JuNi\'s Messenger Server', l_file)
 log(' By JuNi, GitHub: https://github.com/juni4', l_file)
@@ -183,26 +186,34 @@ if BWLE:
             for line in f:
                 BADWORDS.append(line.strip())
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Bad words file loaded.", l_file)
-# If the file is not found, Stop or contiue without it
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+f"] Bad words are: {BADWORDS}.", l_file)
+    # If the file is not found, Stop or contiue without it
     else:
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Bad words file not found.", l_file)
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Continue Anyways? (Y/N)", l_file)
-    x = input().lower()
-    if x == 'y':
-        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Continuing.", l_file)
-    else:
-        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Exiting.", l_file)
-        sys.exit()
+        x = input().lower()
+        if x == 'y':
+            log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Continuing.", l_file)
+        else:
+            log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Exiting.", l_file)
+            sys.exit()
 
-    BADWORDS = []
+    #BADWORDS = []
 
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating bad word filter function", l_file)
 def BadWordFilter(msg):
     # bad word filter
+    ls = msg.split(' ')
+    ls2 = msg.lower().split(' ')
     for o in BADWORDS:
-        if o in msg:
-            length = len(o)
-            msg.replace(o, '*'*length)
+        if o in ls2:
+            ls[ls2.index(o)] = '*'*len(o)
+
+    # Create new message
+    msg = ''
+    for o in ls:
+        msg += o + ' '
+    msg = msg[:-1]
     return msg
 
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating kick function", l_file)
@@ -289,6 +300,8 @@ while True:
                 # ..let USR join
                 # set name of usr
                 name = is_usrn_taken(msg[6:len(msg)])
+                print(name, BadWordFilter(name))
+                name = BadWordFilter(name)
                 # add usr values to joined list
                 usr.append(str(addr[0]))
                 usrn.append(name)
@@ -628,7 +641,7 @@ while True:
             log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
             # Check message for bad words
             msg2 = BadWordFilter(msg)
-            if not msg2 == BadWordFilter(msg):
+            if not msg2 == msg:
                 msg = msg2
                 log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] (Inapropreate Message, New Message) <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
             retmsg = '<'+usrn[usr.index(str(addr[0]))]+'> '+msg

@@ -44,7 +44,7 @@ args_value_type = []
 args_help_hidden = []
 
 # Add argument
-def add_arg(arg_name, optional, arg_alt_value = '', arg_has_alt = False, arg_alt_name = '', arg_help_text = '', has_config = False, config_name = '', has_value = True, value_type = 'string', hidden = False):
+def add_arg(arg_name, optional, arg_alt_value = '', arg_has_alt = False, arg_alt_name = '', arg_help_text = '', has_config = False, config_name = '', has_value = True, value_type = 'str', hidden = False):
     # Check if Argument already exists
     if arg_name in required_arg or arg_name in optional_arg:
         print('Argument already exists')
@@ -143,6 +143,8 @@ def get_arg(arg_name, argv):
             if args_has_value[index]:
                 # Check if Argv has at least one more item after the argument
                 if len(argv)-1 > argv.index(x) and not argv[argv.index(x)+1] in arg_name:
+                    #print(args_value_type[index])
+                    #print(arg_name, args_alt_name[index], argv[argv.index(x)+1])
                     # Convert to correct type
                     if args_value_type[index] == 'any':
                         return argv[argv.index(x)+1]
@@ -151,7 +153,12 @@ def get_arg(arg_name, argv):
                     elif args_value_type[index] == 'float':
                         return float(argv[argv.index(arg_name) + 1])
                     elif args_value_type[index] == 'bool':
-                        return True
+                        if not argv[argv.index(x)+1] == 'False':
+                            return True
+                        else:
+                            return False
+                    elif args_value_type[index] == 'str':
+                        return str(argv[argv.index(arg_name) + 1])
                 elif args_value_type[index] == 'any':
                     return True
 

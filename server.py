@@ -266,6 +266,7 @@ def is_usrn_taken(tusrn):
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Done!", l_file)
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Awaiting Input...", l_file)
 while True:
+    # Recive messages
     try:
         data, address = sock.recvfrom(4096)
         addr = address

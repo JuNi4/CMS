@@ -300,7 +300,6 @@ while True:
                 # ..let USR join
                 # set name of usr
                 name = is_usrn_taken(msg[6:len(msg)])
-                print(name, BadWordFilter(name))
                 name = BadWordFilter(name)
                 # add usr values to joined list
                 usr.append(str(addr[0]))
@@ -638,12 +637,12 @@ while True:
         sock.sendto(bytes('list_update '+str(cserver_ip)+' '+str(PORT)+' '+str(server_name)+' '+str(epw)+' '+str(len(usr))+' Srv','utf-8'), (list_server_ip, int(list_server_port)))
     elif addr[0] in usr and not msg == '':
         if addr[0] in auth or epw == False:
-            log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
             # Check message for bad words
             msg2 = BadWordFilter(msg)
             if not msg2 == msg:
                 msg = msg2
                 log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] (Inapropreate Message, New Message) <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
+            else: log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
             retmsg = '<'+usrn[usr.index(str(addr[0]))]+'> '+msg
             for o in usr:
                 if not o == addr[0]:

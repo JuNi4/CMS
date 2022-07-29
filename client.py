@@ -30,7 +30,6 @@ import playsound
 
 # Import Arguments
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
-print(os.path.dirname(os.path.abspath(__file__)))
 
 import args
 import itj
@@ -284,7 +283,7 @@ else:
 
 # Username
 if '-u' in arg:
-    client_name = arg[arg.index('-u')+1]
+    client_name = arg[arg.index('-u')+1].replace('::',' ')
 else:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
@@ -298,6 +297,7 @@ else:
 if not '-standalone' in arg:
     c_server = threading.Thread(target=client_server, args=('', str(os.getpid()), toasts))
     c_server.start()
+    time.sleep(0.5)
 pw = getarg('-pw', '')
 # Function to send Messages to Server
 def sendMsg(MSG):

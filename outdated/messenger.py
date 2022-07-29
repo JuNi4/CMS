@@ -19,7 +19,11 @@ import threading
 import platform
 import datetime
 import subprocess
-import keyboard
+try:
+    import keyboard
+    kb = True
+except:
+    kb = False
 import pathlib
 import socket
 import sys
@@ -1119,6 +1123,9 @@ if len(arg) > 1:
 #log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] .", l_file)
 
 # If you do not enter any extra details an "UI" will apper to input any data
+if not kb:
+    print('Keyboard Library not available, type -h for help.')
+
 class smenu():
     def styl_menu_vert(name='ExampleMenu',prompt='Pleae select one of the following:' , entrys=['Entry 1','Entry 2','Entry 3'],description=['The Entry 1 of the menu. Press ENTER to select it','Lorem Ipsulm','LOL'],backcolor = '\033[44m',menucolor= '\033[47m',selcolor = '\033[100m', sup = False):
         namel = len(name)

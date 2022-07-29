@@ -26,13 +26,14 @@ import json
 import gtts
 import playsound
 # Images
-import itj
+
 
 # Import Arguments
-# Check if libs folder exists
-if os.path.exists('libs'):
-    sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
+print(os.path.dirname(os.path.abspath(__file__)))
+
 import args
+import itj
 
 # Config file
 # Check if config file exists

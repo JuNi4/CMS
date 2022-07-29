@@ -16,7 +16,6 @@ import os
 import time
 # Img
 import json
-import itj
 
 # Colors
 def rgb(r=0,g=255,b=50):
@@ -40,6 +39,21 @@ def getarg(arg, alt):
         else: return alt
 
 arg = sys.argv
+
+# Import Arguments
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
+
+import args
+import itj
+
+# Setup args
+args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_missing_text='Enables Bad Word List. Default: Disabled', value_type='bool')
+args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_missing_text='Bad Word List; Example: -bwl bad_word_list.txt')
+
+# Get Args
+BWLE = args.get_arg('-bad_word_list_enable', arg)
+BADWORDFILE = args.get_arg('-bad_word_list', arg)
+print(args.get_arg('-bad_word_list', arg))
 
 ## Args
 # help
@@ -157,6 +171,40 @@ server_address = (SERVER, PORT)
 sock.bind(server_address)
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Server opened on port: "+ str(PORT), l_file)
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating server functions", l_file)
+
+# Get Bad Wod List
+log("["+datetime.datetime.now().strftime("%H:%M:%S")+f"] Getting bad words file [{BADWORDFILE}]", l_file)
+BADWORDS = []
+
+if BWLE:
+    if os.path.isfile(BADWORDFILE):
+        # Read from file
+        with open(BADWORDFILE, 'r') as f:
+            for line in f:
+                BADWORDS.append(line.strip())
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Bad words file loaded.", l_file)
+# If the file is not found, Stop or contiue without it
+    else:
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Bad words file not found.", l_file)
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Continue Anyways? (Y/N)", l_file)
+    x = input().lower()
+    if x == 'y':
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Continuing.", l_file)
+    else:
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Exiting.", l_file)
+        sys.exit()
+
+    BADWORDS = []
+
+log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating bad word filter function", l_file)
+def BadWordFilter(msg):
+    # bad word filter
+    for o in BADWORDS:
+        if o in msg:
+            length = len(o)
+            msg.replace(o, '*'*length)
+    return msg
+
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating kick function", l_file)
 def kick(tusr, msg, did, kickindex = '_nonself'):
     # get usr index in usr list
@@ -193,6 +241,7 @@ def kick(tusr, msg, did, kickindex = '_nonself'):
     usr.pop(int(usrindex))
     usrn.pop(int(usrindex))
     usraddr.pop(int(usrindex))
+
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating is_usrn_taken function", l_file)
 def is_usrn_taken(tusrn):
     log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Checking if usrname is already taken", l_file)
@@ -221,7 +270,6 @@ while True:
         data, address = sock.recvfrom(4096)
         addr = address
         msg = data.decode()
-        print(msg,str(addr))
     except Exception as exp:
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] An Error Acurred: "+str(exp), l_file)
         addr = ["0", 0]
@@ -577,6 +625,11 @@ while True:
     elif addr[0] in usr and not msg == '':
         if addr[0] in auth or epw == False:
             log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
+            # Check message for bad words
+            msg2 = BadWordFilter(msg)
+            if not msg2 == BadWordFilter(msg):
+                msg = msg2
+                log('['+datetime.datetime.now().strftime("%H:%M:%S")+'] (Inapropreate Message, New Message) <'+usrn[usr.index(str(addr[0]))]+'> '+msg, l_file)
             retmsg = '<'+usrn[usr.index(str(addr[0]))]+'> '+msg
             for o in usr:
                 if not o == addr[0]:

@@ -117,12 +117,12 @@ def check_args(argv, list_missing = False):
 # Get Argument
 def get_arg(arg_name, argv):
     # Get Argument index
-    if arg_name in required_arg:
-        index = args_name.index(arg_name)
-    elif arg_name in optional_arg:
+    if arg_name in args_name:
         index = args_name.index(arg_name)
     else:
-        raise 'Argument does not exist'
+        # Spit out error
+        print('Argument does not exist')
+        exit()
     # Check if Config
     if args_has_config[index] and not config_path == '':
         # Load Config
@@ -135,14 +135,14 @@ def get_arg(arg_name, argv):
             return conf[args_config_name[index]]
     # Check if Arg is Present in Argv
     else:
-        if arg_name in argv or args_alt_name[index] in argv:
-            if arg_name in argv:
+        if args_name[index] in argv or args_alt_name[index] in argv:
+            if args_name[index] in argv:
                 x = arg_name
             else:
                 x = args_alt_name[index]
             if args_has_value[index]:
                 # Check if Argv has at least one more item after the argument
-                if len(argv)-1 > argv.index(x) and not argv[argv.index(x)+1] in arg_name and not argv[argv.index(x)+1] in arg_name:
+                if len(argv)-1 > argv.index(x) and not argv[argv.index(x)+1] in arg_name:
                     # Convert to correct type
                     if args_value_type[index] == 'any':
                         return argv[argv.index(x)+1]

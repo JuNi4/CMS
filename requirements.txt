@@ -1,0 +1,14 @@
+getpass
+threading
+subprocess
+datetime
+socket
+sys
+os
+time
+json
+# Audio
+gtts
+playsound == 1.2.2
+# Just for file dialog
+tkinter

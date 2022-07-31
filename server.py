@@ -1,14 +1,9 @@
 # -----------
 # Messenger Server
-# Credits: JuNi4 (https://github.com/JuNi4/CLOS)
+# Credits: JuNi4 (https://github.com/JuNi4)
 # -----------
 
-# ToDo:
-#  - Bad Word Kicker
-#  - Temp Ban
-
 # Imports
-import platform
 import datetime
 import socket
 import sys
@@ -47,18 +42,28 @@ import args
 import itj
 
 # Setup args
+args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
+args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-gcf', arg_help_text='Generates a config file. Does not overwrite old settings.', has_value=True, value_type='bool') # Config file
+args.add_arg('-password', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-pw', arg_help_text='A password that protects the server.', value_type='str')
+args.add_arg('-adim_password', args.ARG_OPTIONAL, arg_alt_value='jf/eu§nf(7UF+3ef5#]534*', arg_has_alt= True, arg_alt_name='-apw', arg_help_text='The admin password that grants people access to powerfull commands.', value_type='str')
+args.add_arg('-log_file', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-lf', arg_help_text='Log file, leave blank for default.', value_type='any')
+args.add_arg('-chat_log_file', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-clf', arg_help_text='Chat log file, leave blank for default.', value_type='any')
+args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
+args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
+args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
 args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool')
 args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt')#, value_type='str')
+
+if args.get_arg('-help'):
+    args.help_message(); exit()
+
+if args.get_arg('-generate_cf'):
+    args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); exit()
 
 # Get Args
 BWLE = args.get_arg('-bad_word_list_enable', arg)
 BADWORDFILE = args.get_arg('-bad_word_list', arg)
 
-## Args
-# help
-if '-h' in arg:
-    print('HELP: \n -h  Help\n -name  Server Name\n -p  Server Port\n -lsip  IP of List Server\n -lsp  Port of List Server\n -els  Enable the list server\n -pw  Password for Server\n -apw  To set the Admin Password\n -disIMG  To Disable Images being displayed')
-    exit()
 # Enable log
 if '-els' in arg:
     els = True
@@ -87,13 +92,9 @@ pw = getarg('-pw', '')
 
 ## Sever
 if l_file == '':
-    l_file = os.path.dirname(os.path.realpath(__file__))+'\\server_log.txt'
-    if not 'Windows' in platform.system():
-        l_file = os.path.dirname(os.path.realpath(__file__))+'/server_log.txt'
+    l_file = os.path.dirname(os.path.realpath(__file__))+'/server_log.txt'
 if ch_log == '':
-    ch_log = os.path.dirname(os.path.realpath(__file__))+'\\messenger_chat_log.txt'
-    if not 'Windows' in platform.system():
-        ch_log = os.path.dirname(os.path.realpath(__file__))+'/messenger_chat_log.txt'
+    ch_log = os.path.dirname(os.path.realpath(__file__))+'/messenger_chat_log.txt'
 log('\n\nlog from '+"--"+datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")+"--\n", l_file, False)
 
 # Get Start Time

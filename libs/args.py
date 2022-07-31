@@ -131,6 +131,8 @@ def get_arg(arg_name):
         if args_config_name[index] in conf:
             # Return Arg
             return conf[args_config_name[index]]
+        else:
+            return args_alt_value[index]
     # Check if Arg is Present in Argv
     else:
         if args_name[index] in argv or args_alt_name[index] in argv:
@@ -151,16 +153,17 @@ def get_arg(arg_name):
                         elif args_value_type[index] == 'int':
                             return int(argv[argv.index(x) + 1])
                         elif args_value_type[index] == 'float':
-                            return float(argv[argv.index(arg_name) + 1])
+                            return float(argv[argv.index(x) + 1])
                         elif args_value_type[index] == 'bool':
                             if not argv[argv.index(x)+1] == 'False':
                                 return True
                             else:
                                 return False
                         elif args_value_type[index] == 'str':
-                            return str(argv[argv.index(arg_name) + 1])
+                            return str(argv[argv.index(x) + 1])
                 elif args_value_type[index] == 'any' or args_value_type[index] == 'bool':
                     return True
+        else: return args_alt_value[index]
 
 # Generate Config File Function
 def generate_config_file(config_path = config_path):

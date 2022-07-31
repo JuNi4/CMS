@@ -10,7 +10,6 @@ ToDo:
 """
 
 # Imports
-import platform
 import datetime
 import socket
 import sys
@@ -40,16 +39,42 @@ def getarg(arg, alt):
 
 arg = sys.argv
 
-# Vars
-PORT = getarg('-p', '4244')
-log_file=getarg('-lf', '')
+# Import Arguments
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
+
+import args
+
+# Config file
+# Check if config file exists
+if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/config.json'):
+    args.config_path = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+
+args.argv = sys.argv
+
+# Arguments
+args.add_arg('-help', args.ARG_OPTIONAL, False, arg_has_alt=True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
+args.add_arg('-generate_cf', args.ARG_OPTIONAL, False, arg_has_alt=True, arg_alt_name='-gcf', arg_help_text='Generates a config file. Does not overwrite old settings.', has_value=True, value_type='bool') # Config file
+args.add_arg('-title', args.ARG_OPTIONAL, 'All known Servers:', arg_alt_name='-lf', arg_help_text = 'Title of the list.', has_config=True, config_name='ls_title')
+args.add_arg('-head', args.ARG_OPTIONAL, 'Name:        IP:              Port:      PW(Y/N):   USR:    Srv/Bng:', arg_alt_name='-lf', arg_help_text = 'Title below title of the list.', has_config=True, config_name='ls_head')
+args.add_arg('-port', args.ARG_OPTIONAL, '4244', arg_alt_name='-lf', arg_help_text = 'The port of the list server.', has_config=True, config_name='ls_port')
+args.add_arg('-log_file', args.ARG_OPTIONAL, '', arg_has_alt=True, arg_alt_name='-lf', arg_help_text = 'Log file path. Leave blank for default.', has_config=True, config_name='ls_log_file', )
+
+if args.get_arg('-help'):
+    args.help_message(); exit()
+
+if args.get_arg('-generate_cf'):
+    args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); exit()
+
+TITLE = args.get_arg('-title')
+HEAD =  args.get_arg('-head')
+
+PORT = args.get_arg('-port')
+log_file = args.get_arg('-log_file')
 
 ## List Server
 dev = False
 if log_file == '':
-    l_file = os.path.dirname(os.path.realpath(__file__))+'\\list_server_log.txt'
-    if not 'Windows' in platform.system():
-        l_file = os.path.dirname(os.path.realpath(__file__))+'/list_server_log.txt'
+    l_file = os.path.dirname(os.path.realpath(__file__))+'/list_server_log.txt'
 else:
     l_file = log_file
 log('\n\nlog from '+"--"+datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")+"--\n", l_file, False)
@@ -136,8 +161,8 @@ while True:
         #print(reg_servers_ip,reg_servers_epw)
         
     elif msg[0:5] == '/list':
-        sock.sendto(bytes('All known Servers:', encoding='utf-8'), (addr[0],4245))
-        sock.sendto(bytes(' Name:        IP:              Port:      PW(Y/N):   USR:    Srv/Bng:', encoding='utf-8'), (addr[0],4245))
+        sock.sendto(bytes(TITLE, encoding='utf-8'), (addr[0],4245))
+        sock.sendto(bytes(HEAD, encoding='utf-8'), (addr[0],4245))
         c = 0
         for o in reg_servers_ip:
             sn = 12-len(reg_servers_name[c])

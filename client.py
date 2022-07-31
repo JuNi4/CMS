@@ -55,6 +55,8 @@ args.add_arg('-disable_toasts', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_nam
 args.add_arg('-standalone_send', args.ARG_OPTIONAL, arg_alt_value=False, arg_help_text='Launches a version of the client without the recieving part. This means, that you need to start the reciever seperatly.', has_config=True, config_name='client_standalone_send', value_type='bool')
 args.add_arg('-standalone_recieve', args.ARG_OPTIONAL, arg_alt_value=False, arg_help_text='Launches a version of the client without the sending part. This means, that you need to start the sender seperatly.', has_config=True, config_name='client_standalone_recieve', value_type='bool')
 args.add_arg('-list_servers', args.ARG_OPTIONAL, False, True, '-list', 'Lists the servers from a list server.', value_type='bool')
+args.add_arg('-ls_ip', args.ARG_OPTIONAL, 'localhost', True, '-lsip', 'List server ip.', value_type='str', has_config=True, config_name='client_listServerIP')
+args.add_arg('-ls_port', args.ARG_OPTIONAL, '4244', True, '-lsp', 'Lists server port.', value_type='str', has_config=True, config_name='client_listServerPort')
 
 if args.get_arg('-help'):
     args.help_message(); exit()
@@ -103,7 +105,7 @@ arg = sys.argv
 
 if args.get_arg('-list_servers'):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(bytes("/list", encoding='utf-8'), (args.get_arg('-ip'),int(args.get_arg('-p'))))
+    sock.sendto(bytes("/list", encoding='utf-8'), (args.get_arg('-ls_ip'),int(args.get_arg('-ls_port'))))
     sock.close()
     # ip and port for list server
     SERVER = ""

@@ -489,7 +489,7 @@ while True:
         sendji = itj.manage_json(1,sc,rcvstr)
         # display
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Image '"+ij["name"]+"':", l_file)
-        if not args.get_arg('-diable_images'):
+        if not args.get_arg('-disable_images'):
             itj.json_to_text(1,sc,sendji)
         else:
             print(" [IMAGE HIDDEN BECAUSE -disIMG IN ARGUMENTS]")

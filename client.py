@@ -135,17 +135,18 @@ if args.get_arg('-list_servers'):
 ## Client Server
 def client_server(ip = "", cpid = '', toasts = True):
     # Window Focus and Toast stuff
-    if not 'Windows' in platform.system():
-        import gi
-        gi.require_version("Wnck", "3.0")
-        from gi.repository import Wnck
-        from Xlib import X, XK, protocol, display, Xcursorfont
-        from Xlib.ext import xtest
-        from Xlib.protocol import request
-    else:
-        from win10toast import ToastNotifier
-        import win32gui
-        import win32con
+    if toasts:
+        if not 'Windows' in platform.system():
+            import gi
+            gi.require_version("Wnck", "3.0")
+            from gi.repository import Wnck
+            from Xlib import X, XK, protocol, display, Xcursorfont
+            from Xlib.ext import xtest
+            from Xlib.protocol import request
+        else:
+            from win10toast import ToastNotifier
+            import win32gui
+            import win32con
     # If current window in focus
     def isFocused():
         if 'Windows' in platform.system():
@@ -205,12 +206,14 @@ def client_server(ip = "", cpid = '', toasts = True):
                 if data.decode()[0:41] == "!leave_account_requested_by_self _nonself":
                     if data.decode()[42:48] == "__msg:":
                         print('You got Kicked! Reason: '+data.decode()[48:])
-                        if not isFocused():
-                            Toast("Disconnected: Kicked: "+data.decode()[48:], "Messenger")
+                        if toasts:
+                            if not isFocused():
+                                Toast("Disconnected: Kicked: "+data.decode()[48:], "Messenger")
                     else:
                         print('You got kicked!')
-                        if not isFocused():
-                            Toast("Disconnected: Kicked", "Messenger")
+                        if toasts:
+                            if not isFocused():
+                                Toast("Disconnected: Kicked", "Messenger")
                     if 'Windows' in platform.system():
                         os.system('taskkill /PID '+cpid+' /F>nil')
                     else:
@@ -218,8 +221,9 @@ def client_server(ip = "", cpid = '', toasts = True):
                     
                     time.sleep(2)
                 elif data.decode()[0:42] == "!leave_account_requested_by_self _svclosed":
-                    if not isFocused():
-                        Toast("Disconnected: Server Closed", "Messenger")
+                    if toasts:
+                        if not isFocused():
+                            Toast("Disconnected: Server Closed", "Messenger")
                     print('Server Closed')
                     if 'Windows' in platform.system():
                         os.system('taskkill /PID '+cpid+' /F>nil')
@@ -275,8 +279,9 @@ def client_server(ip = "", cpid = '', toasts = True):
             elif not data.decode() == '':
                 print(data.decode())
                 if not 'Windows' in platform.system():
-                    if not isFocused():
-                        Toast(data.decode(), "Messenger")
+                    if toasts:
+                        if not isFocused():
+                            Toast(data.decode(), "Messenger")
 
 
 ## Client

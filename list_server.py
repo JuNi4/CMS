@@ -13,7 +13,6 @@ ToDo:
 import platform
 import datetime
 import socket
-import select
 import sys
 import os
 import time

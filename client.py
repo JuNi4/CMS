@@ -43,7 +43,7 @@ if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/config.json'):
 args.argv = sys.argv
 
 args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
-args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-gcf', arg_help_text='Generates a config file.', has_value=True, value_type='bool') # Config file
+args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-gcf', arg_help_text='Generates a config file. Does not overwrite old settings.', has_value=True, value_type='bool') # Config file
 args.add_arg('-ip', args.ARG_REQUIRED, arg_help_text='The IP of the server to connect to.', has_config=True, config_name='client_ip') # IP
 args.add_arg('-port', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-p', arg_alt_value=4242, arg_help_text='The port of the server to connect to.', has_config=True, config_name='client_port', value_type='int') # Port
 args.add_arg('-username', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-u', arg_help_text='The username that will be shown.', has_config=True, config_name='client_userName') # Username

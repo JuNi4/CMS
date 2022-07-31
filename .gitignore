@@ -122,3 +122,4 @@ server_log.txt
 libs/test.py
 
 bad_words.txt
+*/config.json

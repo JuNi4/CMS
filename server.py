@@ -41,18 +41,24 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
 import args
 import itj
 
+if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/config.json'):
+    args.config_path = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+args.argv = sys.argv
+
 # Setup args
-args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
-args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-gcf', arg_help_text='Generates a config file. Does not overwrite old settings.', has_value=True, value_type='bool') # Config file
-args.add_arg('-password', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-pw', arg_help_text='A password that protects the server.', value_type='str')
-args.add_arg('-adim_password', args.ARG_OPTIONAL, arg_alt_value='jf/eu§nf(7UF+3ef5#]534*', arg_has_alt= True, arg_alt_name='-apw', arg_help_text='The admin password that grants people access to powerfull commands.', value_type='str')
-args.add_arg('-log_file', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-lf', arg_help_text='Log file, leave blank for default.', value_type='any')
-args.add_arg('-chat_log_file', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-clf', arg_help_text='Chat log file, leave blank for default.', value_type='any')
-args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
-args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
-args.add_arg('', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='', arg_help_text='', value_type='str')
-args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool')
-args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt')#, value_type='str')
+args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
+args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-gcf', arg_help_text='Generates a config file. Does not overwrite old settings.', has_value=True, value_type='bool') # Config file
+args.add_arg('-port', args.ARG_OPTIONAL, arg_alt_value=4242, arg_has_alt= True, arg_alt_name='-p', arg_help_text='The port, that the server opens on.', value_type='int', has_config=True, config_name='server_port')
+args.add_arg('-password', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-pw', arg_help_text='A password that protects the server.', value_type='str', has_config=True, config_name='server_password')
+args.add_arg('-admin_password', args.ARG_OPTIONAL, arg_alt_value='jf/eu§nf(7UF+3ef5#]534*', arg_has_alt= True, arg_alt_name='-apw', arg_help_text='The admin password that grants people access to powerfull commands.', value_type='str', has_config=True, config_name='server_adminPassword')
+args.add_arg('-log_file', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-lf', arg_help_text='Log file, leave blank for default.', value_type='str', has_config=True, config_name='server_logFile')
+args.add_arg('-chat_log_file', args.ARG_OPTIONAL, arg_alt_value=';;_not_active_', arg_has_alt= True, arg_alt_name='-clf', arg_help_text='Chat log file, leave blank for default.', value_type='str', has_config=True, config_name='server_chatLogFile')
+args.add_arg('-list_server_ip', args.ARG_OPTIONAL, arg_alt_value=';;_not_active_', arg_has_alt= True, arg_alt_name='-lsip', arg_help_text='The list server IP', value_type='str', has_config=True, config_name='server_listServerIP')
+args.add_arg('-list_server_port', args.ARG_OPTIONAL, arg_alt_value='4244', arg_has_alt= True, arg_alt_name='-lsp', arg_help_text='The list server port', value_type='str', has_config=True, config_name='server_listServerPort')
+args.add_arg('-server_name', args.ARG_OPTIONAL, arg_alt_value='NoName', arg_has_alt= True, arg_alt_name='-n', arg_help_text='The name of the server', value_type='str', has_config=True, config_name='server_name')
+args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool', has_config=True, config_name='server_badWordFilter')
+args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt', has_config=True, config_name='server_badWordFile')#, value_type='str')
+args.add_arg('-disable_images', args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-disIMG', arg_help_text='Disables images.', value_type='bool', has_config=True, config_name='server_disableImages')
 
 if args.get_arg('-help'):
     args.help_message(); exit()
@@ -61,34 +67,25 @@ if args.get_arg('-generate_cf'):
     args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); exit()
 
 # Get Args
-BWLE = args.get_arg('-bad_word_list_enable', arg)
-BADWORDFILE = args.get_arg('-bad_word_list', arg)
+BWLE = args.get_arg('-bad_word_list_enable')
+BADWORDFILE = args.get_arg('-bad_word_list')
 
 # Enable log
-if '-els' in arg:
-    els = True
-else:
-    els = False
-if '-pw' in arg:
-    epw = True
-else:
-    epw = False
-# Enable Chat Log
-if '-ecl' in arg:
-    ecl = True
-else:
-    ecl = False
+els = not args.get_arg('-list_server_ip') == ';;_not_active_'
+ecl = not args.get_arg('-chat_log_file') == ';;_not_active_'
+
+epw = not args.get_arg('-password') == ''
 
 # Vars
-list_server_ip=getarg('-lsip', 'localhost')
-list_server_port=getarg('-lsp', '4244')
-server_name=getarg('-name', 'NoName')
-server_port=getarg('-p', '4242')
+list_server_ip=args.get_arg('-list_server_ip')
+list_server_port=args.get_arg('-list_server_port')
+server_name=args.get_arg('-server_name')
+server_port=args.get_arg('-port')
 listtheserver=els
-l_file=getarg('-lf', '')
-ch_log=getarg('-cl', '')
-apw=getarg('-apw','jf/eu§nf(7UF+3ef5#]534*')
-pw = getarg('-pw', '')
+l_file=args.get_arg('-log_file')
+ch_log=args.get_arg('-chat_log_file')
+apw=args.get_arg('-admin_password')
+pw = args.get_arg('-password')
 
 ## Sever
 if l_file == '':
@@ -312,7 +309,13 @@ while True:
                 if ecl:
                     # Read chatlog file
                     log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Reading Chat log", l_file)
-                    clog = open(ch_log, 'r')
+                    try:
+                        clog = open(ch_log, 'r')
+                    except:
+                        f = open(ch_log, 'w')
+                        f.close()
+                        clog = open(ch_log, 'r')
+                    
                     chlog_ar = []
                     for line in clog:
                         chlog_ar.append(line.rstrip())
@@ -486,7 +489,7 @@ while True:
         sendji = itj.manage_json(1,sc,rcvstr)
         # display
         log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Image '"+ij["name"]+"':", l_file)
-        if not '-disIMG' in sys.argv:
+        if not args.get_arg('-diable_images'):
             itj.json_to_text(1,sc,sendji)
         else:
             print(" [IMAGE HIDDEN BECAUSE -disIMG IN ARGUMENTS]")

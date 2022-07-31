@@ -36,16 +36,35 @@ import itj
 
 # Config file
 # Check if config file exists
-if os.path.isfile(os.path.dirname(os.path.relpath(__file__))+'/config.json'):
-    args.config_path = os.path.dirname(os.path.relpath(__file__))+'/config.json'
+if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/config.json'):
+    args.config_path = os.path.dirname(os.path.abspath(__file__))+'/config.json'
 
 # Setup Arguments
-args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_help_text='Print this help message', has_value=False) # Help
-args.add_arg('-ip', args.ARG_REQUIRED, arg_help_text='The IP of the server to connect to') # IP
-args.add_arg('-port', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-p', arg_help_text='The port of the server to connect to') # Port
-args.add_arg('-username', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-u', arg_help_text='The username that will be shown') # Username
-args.add_arg('-tts_language', args.ARG_OPTIONAL, arg_alt_value='en', arg_has_alt=True, arg_alt_name='-ttsl', arg_help_text='The language of the text to speech voice') # Text to Speech Language
-args.add_arg('-disable_tts', args.ARG_OPTIONAL)
+args.argv = sys.argv
+
+args.add_arg('-help', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-h', arg_help_text='Print this help message.', has_value=True, value_type='bool') # Help
+args.add_arg('-generate_cf', args.ARG_OPTIONAL, arg_has_alt= True, arg_alt_name='-gcf', arg_help_text='Generates a config file.', has_value=True, value_type='bool') # Config file
+args.add_arg('-ip', args.ARG_REQUIRED, arg_help_text='The IP of the server to connect to.', has_config=True, config_name='client_ip') # IP
+args.add_arg('-port', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-p', arg_alt_value=4242, arg_help_text='The port of the server to connect to.', has_config=True, config_name='client_port', value_type='int') # Port
+args.add_arg('-username', args.ARG_REQUIRED, arg_has_alt=True, arg_alt_name='-u', arg_help_text='The username that will be shown.', has_config=True, config_name='client_userName') # Username
+args.add_arg('-password', args.ARG_OPTIONAL, arg_alt_value='',arg_has_alt=True,arg_alt_name='-pw', arg_help_text='The password to be send to a server. Some server might require this.', has_config=True,config_name='client_password') # Password
+args.add_arg('-tts_language', args.ARG_OPTIONAL, arg_alt_value='en', arg_has_alt=True, arg_alt_name='-ttsl', arg_help_text='The language of the text to speech voice.', has_config=True, config_name='client_ttsLanguage') # Text to Speech Language
+args.add_arg('-disable_tts', args.ARG_OPTIONAL, arg_alt_value=False, arg_has_alt=True, arg_alt_name='-dtts', arg_help_text='Disables the text to speech feature.', has_config=True, config_name='client_disableTTS', value_type='bool')
+args.add_arg('-disable_images', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-disimg', arg_alt_value=False, arg_help_text='Diables images being displayed.', has_config=True, config_name='client_disableImages', value_type='bool')
+args.add_arg('-disable_toasts', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-distoasts', arg_alt_value=False, arg_help_text='Diables toasts - notifications from showing up.', has_config=True, config_name='client_disableToasts', value_type='bool')
+args.add_arg('-standalone_send', args.ARG_OPTIONAL, arg_alt_value=False, arg_help_text='Launches a version of the client without the recieving part. This means, that you need to start the reciever seperatly.', has_config=True, config_name='client_standalone_send', value_type='bool')
+args.add_arg('-standalone_recieve', args.ARG_OPTIONAL, arg_alt_value=False, arg_help_text='Launches a version of the client without the sending part. This means, that you need to start the sender seperatly.', has_config=True, config_name='client_standalone_recieve', value_type='bool')
+args.add_arg('-list_servers', args.ARG_OPTIONAL, False, True, '-list', 'Lists the servers from a list server.', value_type='bool')
+
+if args.get_arg('-help'):
+    args.help_message(); exit()
+
+if args.get_arg('-generate_cf'):
+    args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); exit()
+
+result, missing = args.check_args(True)
+
+if not result: exit()
 
 # Colors
 def rgb(r=0,g=255,b=50):
@@ -60,13 +79,6 @@ def log(log_string, log_file, o = True):
     f = open(log_file, 'a')
     f.write(log_string+'\n')
     f.close()
-
-# get -xyz arg in sys.argv
-def getarg(arg, alt):
-    if not arg == '':
-        if arg in sys.argv:
-            return sys.argv[sys.argv.index(arg)+1]
-        else: return alt
 
 # Text to Speech if error accours: pip install playsound==1.2.2
 def tts(text, lan):
@@ -85,13 +97,13 @@ if '-dis_tts' in sys.argv:
 else:
     tts_enabled = True
 
-tts_lang = getarg('-tts_lang', 'en')
+tts_lang = args.get_arg('-tts_language')
 
 arg = sys.argv
 
-if 'list' in arg:
+if args.get_arg('-list_servers'):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(bytes("/list", encoding='utf-8'), (getarg('-ip', 'localhost'),int(getarg('-p', '4244'))))
+    sock.sendto(bytes("/list", encoding='utf-8'), (args.get_arg('-ip'),int(args.get_arg('-p'))))
     sock.close()
     # ip and port for list server
     SERVER = ""
@@ -180,7 +192,7 @@ def client_server(ip = "", cpid = '', toasts = True):
 
     #print("Server arbeitet auf Port ", PORT, sep="")
     show_img = True
-    if '-disimg' in sys.argv:
+    if args.get_arg('-disable_images'):
         show_img = False
 
 
@@ -267,38 +279,33 @@ def client_server(ip = "", cpid = '', toasts = True):
 
 ## Client
 # IP Check
-if '-ip' in arg:
-    SERVER = arg[arg.index('-ip')+1]
-else:
-    # Exit if IP is not defined
-    print('ERROR: Server address needs to be defined (-ip [ip])')
-    exit()
+SERVER = args.get_arg('-ip')
+#    print('ERROR: Server address needs to be defined (-ip [ip])')
+#    exit()
 
 # Port Check
-if '-p' in arg:
-    PORT = arg[arg.index('-p')+1]
-else:
-    # Default port to 4242
-    PORT = 4242
+PORT = args.get_arg('-port')
 
 # Username
-if '-u' in arg:
-    client_name = arg[arg.index('-u')+1].replace('::',' ')
+if not args.get_arg('-username') == '':
+    client_name = args.get_arg('-username').replace('::',' ')
 else:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
     print('Warning, Username will be you IP: '+s.getsockname()[0])
     client_name = s.getsockname()[0]
     s.close()
-if not 'disToasts' in arg:
-    toasts = True
-else:
-    toasts = False
-if not '-standalone' in arg:
+toasts = not args.get_arg('-disable_toasts')
+tts_enabled = not args.get_arg('-disable_tts')
+
+if not args.get_arg('-standalone_send'):
     c_server = threading.Thread(target=client_server, args=('', str(os.getpid()), toasts))
     c_server.start()
     time.sleep(0.5)
-pw = getarg('-pw', '')
+
+if args.get_arg('-standalone_recieve'): exit()
+
+pw = args.get_arg('-password')
 # Function to send Messages to Server
 def sendMsg(MSG):
     # Socket erzeugen

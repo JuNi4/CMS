@@ -1,9 +1,12 @@
 # Library File
 import json
+import os
 
 # Config file
 config_path = ''
 conf = None
+
+argv = []
 
 # Help Message
 help_message_title = 'Help:'
@@ -85,43 +88,38 @@ def add_arg(arg_name, optional, arg_alt_value = '', arg_has_alt = False, arg_alt
     #    raise 'Invalid argument option \'optional\' Is required, Example: args.ARG_REQUIRED() or args.ARG_OPTIONAL()'
 
 # Check if all required arguments are present, returns True if all are present and False if not
-def check_args(argv, list_missing = False):
+def check_args(list_missing = False, list_missing_header='The following required arguments are missing:'):
     missing_arguments = []
-    for o in required_arg:
-        # Check if Config
-        if not config_path == '':
-            # Load Config
-            f = open(config_path)
-            conf = json.loads(f.read())
-            f.close()
-            # Check if Arg is Present
-            if not args_config_name[args_alt_name.index(o)] in conf:
-                # Return False
+    for o in args_name:
+        if o in required_arg:
+            # Check if config file and load
+            conf = {}
+            if not config_path == '':
+                f = open(config_path, 'r')
+                conf = json.loads(f.read())
+                f.close()
+            
+            if not o in argv and o in conf:
                 missing_arguments.append(o)
-        # Check if Arg is Present in Argv
-        else:
-            if not o in argv and not args_alt_name[args_name.index(o)] in argv:
-                # Return False
-                missing_arguments.append(o)
-    if len(missing_arguments) == 0:
-        if list_missing:
-            return True, missing_arguments
-        else:
-            return True
+
+    if list_missing and not missing_arguments == []:
+        print(list_missing_header)
+        for o in missing_arguments:
+            print('  '+o)
+
+    if not missing_arguments == []:
+        return False, missing_arguments
     else:
-        if list_missing:
-            return False, missing_arguments
-        else:
-            return False
+        return True, missing_arguments
 
 # Get Argument
-def get_arg(arg_name, argv):
+def get_arg(arg_name):
     # Get Argument index
     if arg_name in args_name:
         index = args_name.index(arg_name)
     else:
         # Spit out error
-        print('Argument does not exist')
+        print(f'Argument \'{arg_name}\' does not exist')
         exit()
     # Check if Config
     if args_has_config[index] and not config_path == '':
@@ -142,43 +140,57 @@ def get_arg(arg_name, argv):
                 x = args_alt_name[index]
             if args_has_value[index]:
                 # Check if Argv has at least one more item after the argument
-                if len(argv)-1 > argv.index(x) and not argv[argv.index(x)+1] in arg_name:
-                    #print(args_value_type[index])
-                    #print(arg_name, args_alt_name[index], argv[argv.index(x)+1])
-                    # Convert to correct type
-                    if args_value_type[index] == 'any':
-                        return argv[argv.index(x)+1]
-                    elif args_value_type[index] == 'int':
-                        return int(argv[argv.index(x) + 1])
-                    elif args_value_type[index] == 'float':
-                        return float(argv[argv.index(arg_name) + 1])
-                    elif args_value_type[index] == 'bool':
-                        if not argv[argv.index(x)+1] == 'False':
-                            return True
-                        else:
-                            return False
-                    elif args_value_type[index] == 'str':
-                        return str(argv[argv.index(arg_name) + 1])
-                elif args_value_type[index] == 'any':
+                #print(arg_name,args_value_type[index])
+                if len(argv)-1 > argv.index(x):
+                    if not argv[argv.index(x)+1] in args_name or not argv[argv.index(x)+1] in args_alt_name:
+                        #print(args_value_type[index])
+                        #print(arg_name, args_alt_name[index], argv[argv.index(x)+1])
+                        # Convert to correct type
+                        if args_value_type[index] == 'any':
+                            return argv[argv.index(x)+1]
+                        elif args_value_type[index] == 'int':
+                            return int(argv[argv.index(x) + 1])
+                        elif args_value_type[index] == 'float':
+                            return float(argv[argv.index(arg_name) + 1])
+                        elif args_value_type[index] == 'bool':
+                            if not argv[argv.index(x)+1] == 'False':
+                                return True
+                            else:
+                                return False
+                        elif args_value_type[index] == 'str':
+                            return str(argv[argv.index(arg_name) + 1])
+                elif args_value_type[index] == 'any' or args_value_type[index] == 'bool':
                     return True
 
 # Generate Config File Function
-def generate_config_file(config_path):
+def generate_config_file(config_path = config_path):
+    # Check if config file exists
+    config_data = {}
+    if os.path.isfile(config_path):
+        f = open(config_path, 'r')
+        config_data = json.loads(f.read())
+        f.close()
+    
     # Open Config File
     f = open(config_path, 'w')
     # Write Config File
-    config_data = {}
-    for i in range(len(args_has_config)):
-        if args_config_name[i] == '':
-            continue
+    for i in range(len(args_name)):
+        # Skips if the argument does not haf a config form or the config name is not present
+        if not args_has_config[i]: continue
+        if args_config_name[i] == '': continue
+        # Skip if element is already in config
+        if args_config_name[i] in config_data: continue
+        # Add the specified data
         if args_value_type[i] == 'any':
-            config_data[args_config_name[i]] = ''
+            config_data[args_config_name[i]] = args_alt_value[i]
+        if args_value_type[i] == 'str':
+            config_data[args_config_name[i]] = str(args_alt_value[i])
         elif args_value_type[i] == 'int':
-            config_data[args_config_name[i]] = 0
+            config_data[args_config_name[i]] = int(args_alt_value[i])
         elif args_value_type[i] == 'float':
-            config_data[args_config_name[i]] = 0.0
+            config_data[args_config_name[i]] = float(args_alt_value[i])
         elif args_value_type[i] == 'bool':
-            config_data[args_config_name[i]] = False
+            config_data[args_config_name[i]] = bool(args_alt_value[i])
     f.write(json.dumps(config_data, indent=4))
     # Close Config File
     f.close()

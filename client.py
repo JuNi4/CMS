@@ -19,8 +19,13 @@ import sys
 import os
 import time
 # File Dialog
-import tkinter as tk
-from tkinter import filedialog
+try:
+    import tkinter as tk
+    from tkinter import filedialog
+except:
+    #import tkintertable as tk
+    #from tkintertable import filedialog
+    pass
 import json
 # Text to Speech
 import gtts
@@ -133,7 +138,7 @@ if args.get_arg('-list_servers'):
     exit()
 
 ## Client Server
-def client_server(ip = "", cpid = '', toasts = True):
+def client_server(sock, ip = "", cpid = '', toasts = True):
     # Window Focus and Toast stuff
     if toasts:
         if not 'Windows' in platform.system():
@@ -187,11 +192,11 @@ def client_server(ip = "", cpid = '', toasts = True):
 
     # Server-Port oeffnen
     #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = (SERVER, PORT)
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #server_address = (SERVER, PORT)
 
     # Server an den Port binden
-    sock.bind(server_address)
+    #sock.bind(server_address)
 
     #print("Server arbeitet auf Port ", PORT, sep="")
     show_img = True
@@ -305,8 +310,13 @@ else:
 toasts = not args.get_arg('-disable_toasts')
 tts_enabled = not args.get_arg('-disable_tts')
 
+# Create Socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_address = (SERVER, int(PORT))
+
+# Start receiving thread
 if not args.get_arg('-standalone_send'):
-    c_server = threading.Thread(target=client_server, args=('', str(os.getpid()), toasts))
+    c_server = threading.Thread(target=client_server, args=(sock,'', str(os.getpid()), toasts))
     c_server.start()
     time.sleep(0.5)
 
@@ -317,16 +327,15 @@ pw = args.get_arg('-password')
 def sendMsg(MSG):
     # Socket erzeugen
     # Wir nutzen IPv4, TCP/IP
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = (SERVER, int(PORT))
     # Verbindung aufbauen
     # TODO: Fehler-Auswertung fehlt!!!
     sock.connect(server_address)
     # Nachricht senden
     sock.sendall(MSG)
     # Verbindung wieder trennen
-    sock.close()
+    sock.shutdown(0)
     return 1
+
 if not pw == '':
     sendMsg(bytes('/auth '+pw, 'utf-8'))
 jmsg = '/join '+str(client_name)

@@ -12,4 +12,4 @@ datetime
 gtts
 playsound==1.2.2
 # Just for file dialog
-tkintertable
+tk

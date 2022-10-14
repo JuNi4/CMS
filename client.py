@@ -19,13 +19,8 @@ import sys
 import os
 import time
 # File Dialog
-try:
-    import tkinter as tk
-    from tkinter import filedialog
-except:
-    #import tkintertable as tk
-    #from tkintertable import filedialog
-    pass
+import tkinter as tk
+from tkinter import filedialog
 import json
 # Text to Speech
 import gtts
@@ -37,7 +32,7 @@ import playsound
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
 
 import args
-import itj
+from itj2 import itj
 
 # Config file
 # Check if config file exists
@@ -62,6 +57,15 @@ args.add_arg('-standalone_recieve', args.ARG_OPTIONAL, arg_alt_value=False, arg_
 args.add_arg('-list_servers', args.ARG_OPTIONAL, False, True, '-list', 'Lists the servers from a list server.', value_type='bool')
 args.add_arg('-ls_ip', args.ARG_OPTIONAL, 'localhost', True, '-lsip', 'List server ip.', value_type='str', has_config=True, config_name='client_listServerIP')
 args.add_arg('-ls_port', args.ARG_OPTIONAL, '4244', True, '-lsp', 'Lists server port.', value_type='str', has_config=True, config_name='client_listServerPort')
+
+args.add_arg('-image_res', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-imgres', arg_alt_value=76, arg_help_text='Sets the resoloution of images being displayed.', has_config=True, config_name='client_imageRes', value_type='int')
+# Image Res protection
+if args.get_arg('-image_res') > 256:
+    IMG_RES = 256
+elif args.get_arg('-image_res') < 1:
+    IMG_RES = 1
+else:
+    IMG_RES = args.get_arg('-image_res')
 
 if args.get_arg('-help'):
     args.help_message(); exit()
@@ -193,10 +197,10 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
     # Server-Port oeffnen
     #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    #server_address = (SERVER, PORT)
+    server_address = (SERVER, PORT)
 
     # Server an den Port binden
-    #sock.bind(server_address)
+    sock.bind(server_address)
 
     #print("Server arbeitet auf Port ", PORT, sep="")
     show_img = True
@@ -263,7 +267,7 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                 h2 = h
                 sc = 1
                 # shrink image down if needed
-                while w2 > 38 or h2 > 38:
+                while w2 > IMG_RES or h2 > IMG_RES:
                     sc += 1
                     w2 = int(w/sc)
                     h2 = int(h/sc)
@@ -325,15 +329,13 @@ if args.get_arg('-standalone_recieve'): exit()
 pw = args.get_arg('-password')
 # Function to send Messages to Server
 def sendMsg(MSG):
-    # Socket erzeugen
-    # Wir nutzen IPv4, TCP/IP
-    # Verbindung aufbauen
+    # Create Connection
     # TODO: Fehler-Auswertung fehlt!!!
     sock.connect(server_address)
     # Nachricht senden
     sock.sendall(MSG)
     # Verbindung wieder trennen
-    sock.shutdown(0)
+    #sock.shutdown(0)
     return 1
 
 if not pw == '':
@@ -370,7 +372,7 @@ while True:
                 sc = 1
                 print('OLD W&H: '+str(w)+' '+str(h))
                 # shrink image down if needed
-                while w2 > 38 or h2 > 38:
+                while w2 > IMG_RES or h2 > IMG_RES:
                     sc += 1
                     w2 = int(w/sc)
                     h2 = int(h/sc)

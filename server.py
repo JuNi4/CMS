@@ -39,7 +39,7 @@ arg = sys.argv
 sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
 
 import args
-import itj
+from itj2 import itj
 
 if os.path.isfile(os.path.dirname(os.path.abspath(__file__))+'/config.json'):
     args.config_path = os.path.dirname(os.path.abspath(__file__))+'/config.json'
@@ -59,6 +59,15 @@ args.add_arg('-server_name', args.ARG_OPTIONAL, arg_alt_value='NoName', arg_has_
 args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool', has_config=True, config_name='server_badWordFilter')
 args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt', has_config=True, config_name='server_badWordFile')#, value_type='str')
 args.add_arg('-disable_images', args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-disIMG', arg_help_text='Disables images.', value_type='bool', has_config=True, config_name='server_disableImages')
+
+args.add_arg('-image_res', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-imgres', arg_alt_value=76, arg_help_text='Sets the resoloution of images being displayed.', has_config=True, config_name='server_imageRes', value_type='int')
+# Image Res protection
+if args.get_arg('-image_res') > 256:
+    IMG_RES = 256
+elif args.get_arg('-image_res') < 1:
+    IMG_RES = 1
+else:
+    IMG_RES = args.get_arg('-image_res')
 
 if args.get_arg('-help'):
     args.help_message(); exit()
@@ -481,7 +490,7 @@ while True:
         h2 = h
         sc = 1
         # shrink image down if needed
-        while w2 > 38 or h2 > 38:
+        while w2 > IMG_RES or h2 > IMG_RES:
             sc += 1
             w2 = int(w/sc)
             h2 = int(h/sc)

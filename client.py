@@ -176,7 +176,7 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
             scr = Wnck.Screen.get_default()
             scr.force_update()
             cwin = scr.get_active_window().get_xid()
-            return fwin==cwin
+            return not fwin==cwin
     # Toasts
     def Toast(msg, titl):
         if toasts:

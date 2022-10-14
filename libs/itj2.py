@@ -32,7 +32,10 @@ class itj():
                 try:
                     val2 = img["pix"][i+1][i2]
                 except:
-                    val2 = (0,0,0,0)
+                    try:
+                        val2 = img["pix"][i][i2]
+                    except:
+                        val2 = (0,0,0,0)
                 if bw:
                     rgb = int((val[0]+val[1]+val[2])/3)
                     rgb2 = int((val2[0]+val2[1]+val2[2])/3)
@@ -92,9 +95,12 @@ class itj():
             while i2+shrink <= scaling[0]:
                 val = img["pix"][i][i2]
                 try:
-                    val2 = img["pix"][i][i2]
+                    val2 = img["pix"][i+1][i2]
                 except:
-                    val2 = (0,0,0,0)
+                    try:
+                        val2 = img["pix"][i][i2]
+                    except:
+                        val2 = (0,0,0,0)
                 if bw:
                     rgb1 = int((val[0]+val[1]+val[2])/3)
                     rgb2 = int((val2[0]+val2[1]+val2[2])/3)

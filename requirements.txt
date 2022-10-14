@@ -1,16 +1,16 @@
 #pip install -r requirements.txt
 setuptools
-getpass4
-threading
-subprocess
-datetime
-socket
-sys
-os
-time
-json
+#getpass4
+#threading
+#subprocess
+#datetime
+#socket
+#sys
+#os
+#time
+#json
 # Audio
 gtts
 playsound==1.2.2
 # Just for file dialog
-tkinter
+#tkinter

@@ -124,3 +124,4 @@ libs/test.py
 bad_words.txt
 config.json
 messenger_chat_log.txt
+libs/garbage.png

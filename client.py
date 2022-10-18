@@ -33,6 +33,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/libs')
 
 import args
 from itj2 import itj
+from itj2 import tests
 
 # Config file
 # Check if config file exists
@@ -338,6 +339,72 @@ def sendMsg(MSG):
     #sock.shutdown(0)
     return 1
 
+def sendImg(sc,sendspl):
+    # get calculated shrink values and shrink
+    sendspl = itj.manage_json(1,sc,sendspl)
+    sendspl = sendspl.split(',')
+    sendMsg(bytes('/img '+sendspl[0], 'utf-8'))
+    # Send rest of message
+    a = len(sendspl)
+    #print(str(a),str(int(a/10)*10),str(int(a/10)*10 < a))
+    for i in range(0,10):
+        sendspl.append("")
+    for i in range(0,int((a+1)/10)+1):
+        #print(len(sendspl)-1,i*10+10,int((a)/10)+1)
+        if not sendspl[i*10+1] == ',':
+            try:
+                x = (sendspl[i*10+1]+','+sendspl[i*10+2]+','+sendspl[i*10+3]+','+sendspl[i*10+4]+','+sendspl[i*10+5]+','+sendspl[i*10+6]+','+sendspl[i*10+7]+','+sendspl[i*10+8]+','+sendspl[i*10+9]+','+sendspl[i*10+10]).replace(' ', '')
+                try:
+                    x = x[:x.index('}')+1]
+                except:
+                    pass
+                try:
+                    x = x[:x.index(',,')]
+                except:
+                    pass
+                sendMsg(bytes(x,'utf-8'))
+            except:
+                pass
+        time.sleep(0.01)
+    print('System: Done!')
+
+def prepImg():
+    # Make tkinter window object
+    root = tk.Tk()
+    root.withdraw()
+    # Open file dialog
+    file_path = filedialog.askopenfilename()
+    # Continue only if a path has been selected
+    if not file_path == '':
+        # Check if the is a png or jpg
+        if file_path[len(file_path)-3:].lower() == 'png' or file_path[len(file_path)-3:].lower() == 'jpg':
+            # Load file into Json
+            print('System: Sending File: '+file_path+' To Server..')
+            sendspl = itj.img_to_json(1,1,file_path)
+            # Send first Part of message
+            # Load text to json
+            ij = json.loads(sendspl)
+            w = int(ij["w"])
+            h = int(ij["h"])
+            w2 = w
+            h2 = h
+            sc = 1
+            print('OLD W&H: '+str(w)+' '+str(h))
+            # shrink image down if needed
+            while w2 > IMG_RES or h2 > IMG_RES:
+                sc += 1
+                w2 = int(w/sc)
+                h2 = int(h/sc)
+            print('NEW W&H: '+str(w2)+' '+str(h2)+' AND SCALE: '+str(sc))
+            sendImg(sc,sendspl)
+        else:
+            print('System: Wrong File Format. Only png or jpg.')
+
+
+def sendTestImage():
+    img = tests.generateRandomImage()
+    sendImg(1,img)
+
 if not pw == '':
     sendMsg(bytes('/auth '+pw, 'utf-8'))
 jmsg = '/join '+str(client_name)
@@ -350,62 +417,10 @@ while True:
         mymsg += ' '+password
     # Send an Image to the Server
     if mymsg[:4] == '/img':
-        # Make tkinter window object
-        root = tk.Tk()
-        root.withdraw()
-        # Open file dialog
-        file_path = filedialog.askopenfilename()
-        # Continue only if a path has been selected
-        if not file_path == '':
-            # Check if the is a png or jpg
-            if file_path[len(file_path)-3:].lower() == 'png' or file_path[len(file_path)-3:].lower() == 'jpg':
-                # Load file into Json
-                print('System: Sending File: '+file_path+' To Server..')
-                sendspl = itj.img_to_json(1,1,file_path)
-                # Send first Part of message
-                # Load text to json
-                ij = json.loads(sendspl)
-                w = int(ij["w"])
-                h = int(ij["h"])
-                w2 = w
-                h2 = h
-                sc = 1
-                print('OLD W&H: '+str(w)+' '+str(h))
-                # shrink image down if needed
-                while w2 > IMG_RES or h2 > IMG_RES:
-                    sc += 1
-                    w2 = int(w/sc)
-                    h2 = int(h/sc)
-                # get calculated shrink values and shrink
-                print('NEW W&H: '+str(w2)+' '+str(h2)+' AND SCALE: '+str(sc))
-                sendspl = itj.manage_json(1,sc,sendspl)
-                sendspl = sendspl.split(',')
-                sendMsg(bytes('/img '+sendspl[0], 'utf-8'))
-                # Send rest of message
-                a = len(sendspl)
-                #print(str(a),str(int(a/10)*10),str(int(a/10)*10 < a))
-                for i in range(0,10):
-                    sendspl.append("")
-                for i in range(0,int((a+1)/10)+1):
-                    #print(len(sendspl)-1,i*10+10,int((a)/10)+1)
-                    if not sendspl[i*10+1] == ',':
-                        try:
-                            x = (sendspl[i*10+1]+','+sendspl[i*10+2]+','+sendspl[i*10+3]+','+sendspl[i*10+4]+','+sendspl[i*10+5]+','+sendspl[i*10+6]+','+sendspl[i*10+7]+','+sendspl[i*10+8]+','+sendspl[i*10+9]+','+sendspl[i*10+10]).replace(' ', '')
-                            try:
-                                x = x[:x.index('}')+1]
-                            except:
-                                pass
-                            try:
-                                x = x[:x.index(',,')]
-                            except:
-                                pass
-                            sendMsg(bytes(x,'utf-8'))
-                        except:
-                            pass
-                    time.sleep(0.01)
-                print('System: Done!')
-            else:
-                print('System: Wrong File Format. Only png or jpg.')
+        if mymsg[5:] == 'genTestImg':
+            sendTestImage()
+        else:
+            prepImg()
     else: sendMsg(bytes(mymsg, 'utf-8'))
     if mymsg[0:6] == '/leave':
         print('Leaving...')

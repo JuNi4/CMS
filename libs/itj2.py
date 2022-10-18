@@ -5,18 +5,19 @@ from PIL import Image
 # Json for img to json convertion and vice versa
 import json
 import sys
+import random
 
-# Empfolenes Maximum: 38x38
+# Recommended Maximum: 76x76
+
+class color():
+    r = '\033[1;0m'
+    def rgb(r=0,g=255,b=50):
+        return '\033[38;2;'+str(r)+';'+str(g)+';'+str(b)+'m'
+    def brgb(r=0,g=255,b=50):
+        return '\033[48;2;'+str(r)+';'+str(g)+';'+str(b)+'m'
 
 class itj():
-        
-    class color():
-        r = '\033[1;0m'
-        def rgb(r=0,g=255,b=50):
-            return '\033[38;2;'+str(r)+';'+str(g)+';'+str(b)+'m'
-        def brgb(r=0,g=255,b=50):
-            return '\033[48;2;'+str(r)+';'+str(g)+';'+str(b)+'m'
-
+    # Print an Image
     def img_to_text(scling = 1, shrink = 1, img = 'img.png', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, brgb = color.brgb, rgb = color.rgb, r = color.r):
         scling = int(scling)
         shrink = int(shrink)
@@ -47,6 +48,7 @@ class itj():
             print(pval+r)
         img.close()
 
+    # Convert an image to json
     def img_to_json(scling = 1, shrink = 1, img = 'img.png', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, rgb = color.rgb, r = color.r):
         jo = {
             "name": "lol",
@@ -83,6 +85,7 @@ class itj():
         img.close()
         return json.dumps(jol, indent=4)
     
+    # Print the image from json
     def json_to_text(scling = 1, shrink = 1, json2 = '{"name": "lol", "w": 0, "h": 0, "pix":[[],[]]}', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, brgb = color.brgb, rgb = color.rgb, r = color.r):
         img = json.loads(json2)
         scling = int(scling)
@@ -111,7 +114,8 @@ class itj():
             i += shrink+1
             print(pval+r)
 
-    def manage_json(scling = 1, shrink = 1, json2 = '{"name": "lol", "w": 0, "h": 0, "pix":[[0,0,0],[]]}', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, rgb = color.rgb, r = color.r):
+    # Modify with the image as json
+    def manage_json(scling = 1, shrink = 1, json2 = '{"name": "lol", "w": 0, "h": 0, "pix":[[0,0,0,0],[]]}', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, rgb = color.rgb, r = color.r):
         jo = {
             "name": "lol",
             "w": 0,
@@ -144,7 +148,8 @@ class itj():
                 jol["pix"].append(pval)
         return json.dumps(jol, indent=4)
     
-    def json_to_image(scling = 1, shrink = 1, json2 = '{"name": "lol", "w": 0, "h": 0, "pix":[[0,0,0],[]]}', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, output = 'img.png', rgb = color.rgb, r = color.r):
+    # Convert Json to an Image
+    def json_to_image(scling = 1, shrink = 1, json2 = '{"name": "lol", "w": 0, "h": 0, "pix":[[0,0,0,0],[]]}', bw = False, rc = 0, gc = 1, bc = 2, ac = 3, output = 'img.png', rgb = color.rgb, r = color.r):
         js = json.loads(json2)
         img = Image.new(mode = 'RGB', size = (js["w"]*scling,js['h']*scling))
         scaling = (js["w"],js["h"])
@@ -164,3 +169,24 @@ class itj():
             i += shrink
         img.save(output)
         img.close()
+
+class tests():
+    # generate a random image
+    def generateRandomImage(WIDTH = 76, HEIGHT = 76, BW = False, NAME = "Garbage"):
+        jo = {
+            "name": "lol",
+            "w": WIDTH,
+            "h": HEIGHT,
+            "pix": []
+        }
+
+        # Generate nonsense
+        for h in range(HEIGHT):
+            jo["pix"].append([])
+            for w in range(WIDTH):
+                rand_r = random.randrange(0,255)
+                rand_g = random.randrange(0,255)
+                rand_b = random.randrange(0,255)
+                jo["pix"][h].append([rand_r,rand_g,rand_b, 1])
+
+        return json.dumps(jo, indent=4)

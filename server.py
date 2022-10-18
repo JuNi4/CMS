@@ -261,26 +261,17 @@ def kick(tusr, msg, did, kickindex = '_nonself'):
     usraddr.pop(int(usrindex))
 
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Creating is_usrn_taken function", l_file)
+
 def is_usrn_taken(tusrn):
     log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Checking if usrname is already taken", l_file)
-    x = True
-    c = 1 
-    tuser2 = tusrn
-    while x and c < 100:
-        if tuser2 in usrn:
-            if tuser2 == tusrn:
-                tuser2 == tusrn + str(c)
-            else:
-                tuser2 = tuser2[:len(tuser2)-1]+str(c)
-        else:
-            if tuser2 == tusrn:
-                tuser2 == tusrn
-                log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Usrname "+tuser2+" wasn\'t taken", l_file)
-            else:
-                log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Usrname was taken and is now "+tuser2, l_file)
-            x = False
-        c += 1
-    return tuser2
+    number = 0
+    add = ''
+    while tusrn+add in usrn:
+        number += 1
+        add = '('+str(number)+')'
+
+    return tusrn+add
+    
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Done!", l_file)
 log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Awaiting Input...", l_file)
 while True:

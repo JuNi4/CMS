@@ -418,9 +418,10 @@ while True:
     # Send an Image to the Server
     if mymsg[:4] == '/img':
         if mymsg[5:] == 'genTestImg':
-            sendTestImage()
+            thrd = threading.Thread(target=sendTestImage, args=())
         else:
-            prepImg()
+            thrd = threading.Thread(target=prepImg, args=())
+        thrd.start()
     else: sendMsg(bytes(mymsg, 'utf-8'))
     if mymsg[0:6] == '/leave':
         print('Leaving...')

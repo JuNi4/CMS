@@ -22,6 +22,7 @@ import time
 import tkinter as tk
 from tkinter import filedialog
 import json
+from types import NoneType
 # Text to Speech
 import gtts
 import playsound
@@ -244,11 +245,16 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
             elif data.decode()[:19]=='!important_message ':
                 print(data.decode()[19:])
                 Toast(data.decode()[19:], "Messenger")
-            elif data.decode()[:4] == '!img':
+            elif data.decode()[:5] == '!img ':
                 rcvstr = data.decode()[5:]+','
+                paused_messages = []
                 # Recive every part part of the image
                 while not '}' in list(rcvstr):
                     data, address = sock.recvfrom(4096)
+                    # Don't confuse normal messages as image data
+                    if data.decode().startswith('<'): paused_messages.append(data.decode()); continue
+                    if data.decode().startswith('!'): continue
+                    # IDK
                     if not '}' in list(data.decode()):
                         rcvstr += data.decode()+','
                     else:
@@ -276,6 +282,9 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                 sendji = itj.manage_json(1,sc,rcvstr)
                 # display
                 itj.json_to_text(1,sc,sendji)
+                # Print paused messages
+                for o in paused_messages:
+                    print(o)
             elif data.decode() == '!secure_corckrl':
                 try:
                     os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
@@ -286,6 +295,8 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                 print(data.decode()[5:])
                 if tts_enabled:
                     tts(data.decode()[5:],tts_lang)
+            elif data.decode()[:9] == '!img_port':
+                os.environ["SERVER_IMAGE_PORT"] = data.decode()[10:]
             elif not data.decode() == '':
                 print(data.decode())
                 if not 'Windows' in platform.system():
@@ -319,6 +330,8 @@ tts_enabled = not args.get_arg('-disable_tts')
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_address = (SERVER, int(PORT))
 
+os.environ["SERVER_IMAGE_PORT"] = str(PORT)
+
 # Start receiving thread
 if not args.get_arg('-standalone_send'):
     c_server = threading.Thread(target=client_server, args=(sock,'', str(os.getpid()), toasts))
@@ -329,10 +342,10 @@ if args.get_arg('-standalone_recieve'): exit()
 
 pw = args.get_arg('-password')
 # Function to send Messages to Server
-def sendMsg(MSG):
+def sendMsg(MSG, server_address2 = (SERVER, int(PORT))):
     # Create Connection
     # TODO: Fehler-Auswertung fehlt!!!
-    sock.connect(server_address)
+    sock.connect(server_address2)
     # Nachricht senden
     sock.sendall(MSG)
     # Verbindung wieder trennen
@@ -344,6 +357,11 @@ def sendImg(sc,sendspl):
     sendspl = itj.manage_json(1,sc,sendspl)
     sendspl = sendspl.split(',')
     sendMsg(bytes('/img '+sendspl[0], 'utf-8'))
+    time.sleep(0.1)
+    try:
+        img_port = (server_address[0], int(os.getenv('SERVER_IMAGE_PORT')))
+    except:
+        exit()
     # Send rest of message
     a = len(sendspl)
     #print(str(a),str(int(a/10)*10),str(int(a/10)*10 < a))
@@ -362,7 +380,7 @@ def sendImg(sc,sendspl):
                     x = x[:x.index(',,')]
                 except:
                     pass
-                sendMsg(bytes(x,'utf-8'))
+                sendMsg(bytes(x,'utf-8'), img_port)
             except:
                 pass
         time.sleep(0.01)

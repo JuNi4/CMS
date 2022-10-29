@@ -20,6 +20,7 @@ jobs:
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghrc.io -u $ --password-stdin
     - name: Push image
       run: |
+          IMAGE_NAME=cms-server
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
 
           # Change all uppercase to lowercase

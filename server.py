@@ -20,7 +20,7 @@ def brgb(r=0,g=255,b=50):
 
 # log and print 
 def log(log_string, log_file, o = True):
-    if o:
+    if o and log_file != ';;_not_active_':
         print(log_string)
     f = open(log_file, 'a')
     f.write(log_string+'\n')

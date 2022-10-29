@@ -98,9 +98,9 @@ pw = args.get_arg('-password')
 
 ## Sever
 if l_file == '':
-    l_file = os.path.dirname(os.path.realpath(__file__))+'/server_log.txt'
+    l_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'server_log.txt')
 if ch_log == '':
-    ch_log = os.path.dirname(os.path.realpath(__file__))+'/messenger_chat_log.txt'
+    ch_log = os.path.join(os.path.dirname(os.path.realpath(__file__)),'messenger_chat_log.txt')
 log('\n\nlog from '+"--"+datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")+"--\n", l_file, False)
 
 # Get Start Time

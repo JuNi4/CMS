@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile
+      run: docker build . --file Dockerfile --tag cms-server
     - name: Login to GHCR
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghrc.io -u $ --password-stdin
     - name: Push image

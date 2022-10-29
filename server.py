@@ -20,11 +20,12 @@ def brgb(r=0,g=255,b=50):
 
 # log and print 
 def log(log_string, log_file, o = True):
-    if o and log_file != ';;_not_active_':
+    if o:
         print(log_string)
-    f = open(log_file, 'a')
-    f.write(log_string+'\n')
-    f.close()
+    if log_file != ';;_not_active_':
+        f = open(log_file, 'a')
+        f.write(log_string+'\n')
+        f.close()
 
 # get -xyz arg in sys.argv
 def getarg(arg, alt):

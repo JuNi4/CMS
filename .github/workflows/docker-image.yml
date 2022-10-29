@@ -17,7 +17,7 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag consolemessenger
     - name: Login to GHCR
-      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghrc.io -u $ --pasword-stdin
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghrc.io -u $ --password-stdin
     - name: Push image
       run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME

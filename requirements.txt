@@ -1,5 +1,6 @@
 #pip install -r requirements.txt
 datetime
+Pillow
 # Audio
 gtts
 playsound==1.2.2

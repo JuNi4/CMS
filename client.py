@@ -253,7 +253,6 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                     data, address = sock.recvfrom(4096)
                     # Don't confuse normal messages as image data
                     if data.decode().startswith('<'): paused_messages.append(data.decode()); continue
-                    if data.decode().startswith('!'): continue
                     # IDK
                     if not '}' in list(data.decode()):
                         rcvstr += data.decode()+','
@@ -289,13 +288,20 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                     # Print paused messages
                     for o in paused_messages:
                         print(o)
-                except:
-                    print('Something went wrong while handeling an image.')
+                except Exception as e:
+                    print('Something went wrong while handeling an image: '+e)
             elif data.decode() == '!secure_corckrl':
-                try:
-                    os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-                except:
-                    os.system('start chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+                if 'Windows' in platform.platform():
+                    try:
+                        os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+                    except:
+                        os.system('start chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+                else:
+                    try:
+                        os.system('firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+                    except:
+                        os.system('chrome https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+
             #tts messages
             elif data.decode()[:4] == '!tts':
                 print(data.decode()[5:])

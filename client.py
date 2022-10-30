@@ -266,25 +266,31 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                 #f = open("json.json",'w')
                 #f.write(rcvstr)
                 #f.close()
-                rcvstr = rcvstr[:len(rcvstr)-2]+rcvstr[len(rcvstr)-2:].replace(',','')
-                ij = json.loads(rcvstr)
-                w = int(ij["w"])
-                h = int(ij["h"])
-                w2 = w
-                h2 = h
-                sc = 1
-                # shrink image down if needed
-                while w2 > IMG_RES or h2 > IMG_RES:
-                    sc += 1
-                    w2 = int(w/sc)
-                    h2 = int(h/sc)
-                # get calculated shrink values and shrink
-                sendji = itj.manage_json(1,sc,rcvstr)
-                # display
-                itj.json_to_text(1,sc,sendji)
-                # Print paused messages
-                for o in paused_messages:
-                    print(o)
+                try:
+                    ij = json.loads(rcvstr)
+                except:
+                    rcvstr = rcvstr[:len(rcvstr)-2]+rcvstr[len(rcvstr)-2:].replace(',','')
+                try:
+                    ij = json.loads(rcvstr)
+                    w = int(ij["w"])
+                    h = int(ij["h"])
+                    w2 = w
+                    h2 = h
+                    sc = 1
+                    # shrink image down if needed
+                    while w2 > IMG_RES or h2 > IMG_RES:
+                        sc += 1
+                        w2 = int(w/sc)
+                        h2 = int(h/sc)
+                    # get calculated shrink values and shrink
+                    sendji = itj.manage_json(1,sc,rcvstr)
+                    # display
+                    itj.json_to_text(1,sc,sendji)
+                    # Print paused messages
+                    for o in paused_messages:
+                        print(o)
+                except:
+                    print('Something went wrong while handeling an image.')
             elif data.decode() == '!secure_corckrl':
                 try:
                     os.system('start firefox https://www.youtube.com/watch?v=dQw4w9WgXcQ')

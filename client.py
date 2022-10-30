@@ -289,7 +289,7 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
                     for o in paused_messages:
                         print(o)
                 except Exception as e:
-                    print('Something went wrong while handeling an image: '+e)
+                    print('Something went wrong while handeling an image: '+str(e))
             elif data.decode() == '!secure_corckrl':
                 if 'Windows' in platform.platform():
                     try:

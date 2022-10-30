@@ -22,12 +22,10 @@ def brgb(r=0,g=255,b=50):
 def log(log_string, log_file, o = True):
     if o:
         print(log_string)
-    """
     if log_file != ';_not_active_':
         f = open(log_file, 'a')
         f.write(log_string+'\n')
         f.close()
-    """
 
 # get -xyz arg in sys.argv
 def getarg(arg, alt):
@@ -55,8 +53,8 @@ args.add_arg('-port', args.ARG_OPTIONAL, arg_alt_value=4242, arg_has_alt= True, 
 args.add_arg('-password', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-pw', arg_help_text='A password that protects the server.', value_type='str', has_config=True, config_name='server_password')
 args.add_arg('-admin_password', args.ARG_OPTIONAL, arg_alt_value='jf/eu§nf(7UF+3ef5#]534*', arg_has_alt= True, arg_alt_name='-apw', arg_help_text='The admin password that grants people access to powerfull commands.', value_type='str', has_config=True, config_name='server_adminPassword')
 args.add_arg('-log_file', args.ARG_OPTIONAL, arg_alt_value='', arg_has_alt= True, arg_alt_name='-lf', arg_help_text='Log file, leave blank for default.', value_type='str', has_config=True, config_name='server_logFile')
-args.add_arg('-chat_log_file', args.ARG_OPTIONAL, arg_alt_value=';;_not_active_', arg_has_alt= True, arg_alt_name='-clf', arg_help_text='Chat log file, leave blank for default.', value_type='str', has_config=True, config_name='server_chatLogFile')
-args.add_arg('-list_server_ip', args.ARG_OPTIONAL, arg_alt_value=';;_not_active_', arg_has_alt= True, arg_alt_name='-lsip', arg_help_text='The list server IP', value_type='str', has_config=True, config_name='server_listServerIP')
+args.add_arg('-chat_log_file', args.ARG_OPTIONAL, arg_alt_value=';_not_active_', arg_has_alt= True, arg_alt_name='-clf', arg_help_text='Chat log file, leave blank for default.', value_type='str', has_config=True, config_name='server_chatLogFile')
+args.add_arg('-list_server_ip', args.ARG_OPTIONAL, arg_alt_value=';_not_active_', arg_has_alt= True, arg_alt_name='-lsip', arg_help_text='The list server IP', value_type='str', has_config=True, config_name='server_listServerIP')
 args.add_arg('-list_server_port', args.ARG_OPTIONAL, arg_alt_value='4244', arg_has_alt= True, arg_alt_name='-lsp', arg_help_text='The list server port', value_type='str', has_config=True, config_name='server_listServerPort')
 args.add_arg('-server_name', args.ARG_OPTIONAL, arg_alt_value='NoName', arg_has_alt= True, arg_alt_name='-n', arg_help_text='The name of the server', value_type='str', has_config=True, config_name='server_name')
 args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool', has_config=True, config_name='server_badWordFilter')
@@ -83,8 +81,8 @@ BWLE = args.get_arg('-bad_word_list_enable')
 BADWORDFILE = args.get_arg('-bad_word_list')
 
 # Enable log
-els = not args.get_arg('-list_server_ip') == ';;_not_active_'
-ecl = not args.get_arg('-chat_log_file') == ';;_not_active_'
+els = not args.get_arg('-list_server_ip') == ';_not_active_'
+ecl = not args.get_arg('-chat_log_file') == ';_not_active_'
 
 epw = not args.get_arg('-password') == ''
 

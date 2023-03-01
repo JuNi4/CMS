@@ -16,13 +16,17 @@ Part of CLOS
 Server:
 
 >git clone https://github.com/juni4/cms
+
 >cd cms
+
 >python server.py
 
 Client:
 
 >git clone https://github.com/juni4/cmd
+
 >cd cms
+
 >python client.py -ip [ip of the server] -p [port of the server]
 
 ### Server:

@@ -11,6 +11,19 @@ Part of CLOS
 > Outdated 'outdated/messenger.py' <span style="color:red">Discontinued</span> All in one Pack with Client, Server, List Server.
 
 ## Manual:
+### Quick setup:
+Server:
+ˋˋˋ
+git clone https://github.com/juni4/cms
+cd cms
+python server.py
+ˋˋˋ
+Client:
+ˋˋˋ
+git clone https://github.com/juni4/cmd
+cd cms
+python client.py -ip [ip of the server] -p [port of the server]
+ˋˋˋ
 ### Server:
 To use the messenger, you need a server. Although in theory the client should be able to connect to another client, it is not recommended and any bugs regading these kinds of usecases will not be fixed.\
 To host a server, you need the server.py.

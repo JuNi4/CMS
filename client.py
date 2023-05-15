@@ -128,8 +128,8 @@ if args.get_arg('-list_servers'):
     # Dies ist der Server.
 
     # Server-Port oeffnen
-    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
     server_address = (SERVER, int(PORT))
 
     # Server an den Port binden
@@ -196,7 +196,7 @@ def client_server(sock, ip = "", cpid = '', toasts = True):
 
     # Dies ist der Server.
 
-    # Server-Port oeffnen
+    # Server-Port öffnen
     #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_address = (SERVER, PORT)
@@ -330,7 +330,8 @@ PORT = args.get_arg('-port')
 if not args.get_arg('-username') == '':
     client_name = args.get_arg('-username').replace('::',' ')
 else:
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP | SOCK_STREAM -> TCP
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # TCP
     s.connect(("8.8.8.8", 80))
     print('Warning, Username will be you IP: '+s.getsockname()[0])
     client_name = s.getsockname()[0]

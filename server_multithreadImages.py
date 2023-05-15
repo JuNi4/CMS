@@ -279,7 +279,8 @@ def is_usrn_taken(tusrn):
     
 # Proccesses Images in a new thread
 def processImages(initialMsg, addr, sock, port:int = 0):
-    imgSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_STREAM for tcp -> more reliable image transmission
+    #imgSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_STREAM for tcp -> more reliable image transmission
+    imgSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     img_server_address = ('', port)
     imgSock.bind(img_server_address)
     sock.sendto(bytes('!img_port '+str(imgSock.getsockname()[1]),'utf-8'),(addr[0],4243))

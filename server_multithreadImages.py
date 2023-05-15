@@ -60,8 +60,9 @@ args.add_arg('-list_server_port', args.ARG_OPTIONAL, arg_alt_value='4244', arg_h
 args.add_arg('-server_name', args.ARG_OPTIONAL, arg_alt_value='NoName', arg_has_alt= True, arg_alt_name='-n', arg_help_text='The name of the server', value_type='str', has_config=True, config_name='server_name')
 args.add_arg('-bad_word_list_enable',args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-bwle', arg_help_text='Enables Bad Word List. Default: Disabled', value_type='bool', has_config=True, config_name='server_badWordFilter')
 args.add_arg('-bad_word_list',args.ARG_OPTIONAL(), arg_alt_value='', arg_has_alt=True, arg_alt_name='-bwl', arg_help_text='Bad Word List; Example: -bwl bad_word_list.txt', has_config=True, config_name='server_badWordFile')#, value_type='str')
-args.add_arg('-disable_images', args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-disIMG', arg_help_text='Disables images.', value_type='bool', has_config=True, config_name='server_disableImages')
 
+args.add_arg('-disable_images', args.ARG_OPTIONAL(), arg_alt_value=False, arg_has_alt=True, arg_alt_name='-disIMG', arg_help_text='Disables images.', value_type='bool', has_config=True, config_name='server_disableImages')
+args.add_arg('-image_port', args.ARG_OPTIONAL(), arg_alt_value=0, arg_has_alt=True, arg_alt_name='-imgP', arg_help_text='The port for image transmission.', value_type='int', has_config=True, config_name='server_image_transmission_port')
 args.add_arg('-image_res', args.ARG_OPTIONAL, arg_has_alt=True, arg_alt_name='-imgres', arg_alt_value=76, arg_help_text='Sets the resoloution of images being displayed.', has_config=True, config_name='server_imageRes', value_type='int')
 # Image Res protection
 if args.get_arg('-image_res') > 256:
@@ -97,6 +98,8 @@ l_file=args.get_arg('-log_file')
 ch_log=args.get_arg('-chat_log_file')
 apw=args.get_arg('-admin_password')
 pw = args.get_arg('-password')
+
+imgP = args.get_arg('-image_port')
 
 ## Sever
 if l_file == '':
@@ -275,13 +278,13 @@ def is_usrn_taken(tusrn):
     return tusrn+add
     
 # Proccesses Images in a new thread
-def processImages(initialMsg, addr, sock):
-    imgSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    img_server_address = ('', 0)
+def processImages(initialMsg, addr, sock, port:int = 0):
+    imgSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_STREAM for tcp -> more reliable image transmission
+    img_server_address = ('', port)
     imgSock.bind(img_server_address)
     sock.sendto(bytes('!img_port '+str(imgSock.getsockname()[1]),'utf-8'),(addr[0],4243))
     # Send the client the port
-    log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [Img Processor] Recived Image from USR: "+usrn[usr.index(addr[0])], l_file)
+    log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [Img Processor] Reciving Image from USR: "+usrn[usr.index(addr[0])], l_file)
     rcvstr = initialMsg[5:]+','
     # Recive every part part of the image
     while not '}' in list(rcvstr):
@@ -303,7 +306,14 @@ def processImages(initialMsg, addr, sock):
     #f = open("json.json",'w')
     #f.write(rcvstr)
     #f.close()
-    ij = json.loads(rcvstr)
+    # try to convert the string to json
+    try:
+        ij = json.loads(rcvstr)
+    # if bad json was received, print a message
+    except json.decoder.JSONDecodeError:
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [ERROR] Received invalid JSON data.", l_file)
+        return
+    
     name = ij["name"]
     if "rick__roll" in name:
         for o in usr:
@@ -536,7 +546,7 @@ while True:
                 log('Send userlist to User Ip: '+o+' Name='+usrn[usr.index(o)])
     elif msg[0:4] == '/img' and addr[0] in usr:
         #processImages(tmpSock.getsockname()[1], msg) # Process Image
-        thrd = threading.Thread(target=processImages, args=(msg, addr, sock))
+        thrd = threading.Thread(target=processImages, args=(msg, addr, sock, imgP))
         thrd.start()
     # Recive & Send TTS messages
     elif msg[0:4] == '/tts' and addr[0] in usr:

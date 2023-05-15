@@ -471,7 +471,11 @@ while True:
         #f = open("json.json",'w')
         #f.write(rcvstr)
         #f.close()
-        ij = json.loads(rcvstr)
+        try:
+            ij = json.loads(rcvstr)
+        except json.decoder.JSONDecodeError:
+            log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [ERROR] Received invalid JSON data.", l_file)
+            continue
         name = ij["name"]
         if "rick__roll" in name:
             for o in usr:

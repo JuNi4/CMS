@@ -76,7 +76,7 @@ if args.get_arg('-help'):
     args.help_message(); exit()
 
 if args.get_arg('-generate_cf'):
-    args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); exit()
+    args.generate_config_file(os.path.dirname(os.path.abspath(__file__))+'/config.json'); print("Created config file."); exit()
 
 # Get Args
 BWLE = args.get_arg('-bad_word_list_enable')

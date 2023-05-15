@@ -23,7 +23,7 @@ Server:
 
 Client:
 
->git clone https://github.com/juni4/cmd
+>git clone https://github.com/juni4/cms
 
 >cd cms
 

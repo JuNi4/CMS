@@ -14,20 +14,19 @@ Part of CLOS
 ### Quick setup:
 
 Server:
-
+>```
 >git clone https://github.com/juni4/cms
-
 >cd cms
-
 >python server.py
+>```
 
 Client:
 
+>```
 >git clone https://github.com/juni4/cms
-
 >cd cms
-
 >python client.py -ip [ip of the server] -p [port of the server]
+>```
 
 ### Server:
 To use the messenger, you need a server. Although in theory the client should be able to connect to another client, it is not recommended and any bugs regading these kinds of usecases will not be fixed.\

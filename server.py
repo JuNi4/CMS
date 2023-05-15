@@ -451,7 +451,7 @@ while True:
             if dev:
                 log('Send userlist to User Ip: '+o+' Name='+usrn[usr.index(o)])
     elif msg[0:4] == '/img' and addr[0] in usr:
-        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Recived Image from USR: "+usrn[usr.index(addr[0])], l_file)
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Received Image from USR: "+usrn[usr.index(addr[0])], l_file)
         rcvstr = msg[5:]+','
         # Recive every part part of the image
         while not '}' in list(rcvstr):

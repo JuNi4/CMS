@@ -282,7 +282,7 @@ while True:
         addr = address
         msg = data.decode()
     except Exception as exp:
-        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] An Error Acurred: "+str(exp), l_file)
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [ERROR] An Error Acurred Receiving A Message: "+str(exp), l_file)
         addr = ["0", 0]
         msg = ""
     #log(str(addr)+': '+data.decode(), "'", sep="")
@@ -451,7 +451,7 @@ while True:
             if dev:
                 log('Send userlist to User Ip: '+o+' Name='+usrn[usr.index(o)])
     elif msg[0:4] == '/img' and addr[0] in usr:
-        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Received Image from USR: "+usrn[usr.index(addr[0])], l_file)
+        log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] Receiving Image from USR: "+usrn[usr.index(addr[0])], l_file)
         rcvstr = msg[5:]+','
         # Recive every part part of the image
         while not '}' in list(rcvstr):
@@ -471,8 +471,10 @@ while True:
         #f = open("json.json",'w')
         #f.write(rcvstr)
         #f.close()
+        # try to convert the string to json
         try:
             ij = json.loads(rcvstr)
+        # if bad json was received, print a message
         except json.decoder.JSONDecodeError:
             log("["+datetime.datetime.now().strftime("%H:%M:%S")+"] [ERROR] Received invalid JSON data.", l_file)
             continue
